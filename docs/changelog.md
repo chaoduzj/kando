@@ -23,21 +23,37 @@ This changelog follows the rules of [Keep a Changelog](http://keepachangelog.com
 
 #### :tada: Added
 
+- **A new way of interaction: Hover Mode!** This is for power users only: It's like turbo mode, but you don't have to press any keys. Just move the mouse to the item you want to select and wait a fraction of a second. This is by far the fastest way to navigate through your menus, but it can also lead to accidental selections as there is no way to visually confirm the selection before it happens. You can enable this in the settings under "Menu Behavior". You can set `"menuOptions": {"hoverModeNeedsConfirmation": true}` in your `config.json` to tweak the hover mode so that it requires a final click to select an item. This is a bit slower, but it can prevent accidental selections.
 - **A new item type: Open File!** Use this to open files or directories with the default application. You could do this with the Command or Open URI item types before, but this new item type is more intuitive. Also, the Open URI type had issues with non-ASCII characters in the file path, which should be fixed with this new item type.
+- **A new item type: Redirect!** Use this to open a different menu when the item is selected. Thanks to [@yar2000T](https://github.com/yar2000T) for contributing this feature!
 - **Experimental support arm64 on Linux!** There is now an experimental arm64 build for Linux. Please test it and report any issues you encounter!
 - **Two new tray icon flavors!** There is now also a `'white'` and a `'black'` flavor. You can choose them in your `config.json` using the `trayIconFlavor` property. The default is still `'color'`. Thanks to [@kartik-raj7](https://github.com/kartik-raj7) for the contribution!
 - **The possibility to temporarily disable all shortcuts** by using the tray icon context menu. Thanks to [@yar2000T](https://github.com/yar2000T) for contributing this feature!
+- Support for version two of the remote desktop portal which allows restoring the session after the application has been restarted. This means the annoying dialog asking for permissions on KDE Wayland will hopefully only appear once from now on.
+- Several translation updates: Thanks to all the contributors!
+- Support for GNOME 48.
+- Support for Node 23.
 
 #### :wrench: Changed
 
+- Menu items will now move to the mouse pointer on pointer-down events instead of pointer-up events. This makes the menu feel more responsive.
 - The Windows installer now shows a custom gif animation instead of the default Squirrel animation.
 - The Windows installer now uses the new Kando icon instead of the default Electron icon.
 - On Windows, Kando will now also show a custom icon in the Control Panel > Programs and Features section. Before, the Electron icon was shown there.
+- The appearance of the large variant of the Kando icon. The overall shape is now more similar to the medium variant. This is only used on Windows and macOS.
+- The `--menu` command line flag will now produce an error message if the specified menu does not exist. Before, it would just open the first menu.
+- The default menu menu on Windows does not use the `explorer` command anymore. This caused a notification to be shown that "the action could not be executed" even if it actually worked (see [#550](https://github.com/kando-menu/kando/issues/550)).
 
 #### :bug: Fixed
 
 - A bug which caused a black menu background on Linux when auto-starting Kando on login. The solution involves that the menu window is now initialized lazily. This means, that the first time a menu is opened, it may take a little longer to appear. But this should only happen once per session.
 - Simulating <kbd>Numpad Subtract</kbd> on Windows.
+- Selecting items with Turbo-Mode involving the <kbd>Meta</kbd> key on Linux. Thanks to [@gb2dev](https://github.com/gb2dev) for the fix!
+- The appearance of the application icon on KDE. The SVG variant of the icon contained clipping paths which are not supported by KDE.
+- A freeze on newer versions of Hyprland when trying to warp the mouse pointer or simulating a keystroke.
+- On GNOME Wayland, the menu will now open more close to the pointer if a text-scaling factor other than one is used.
+- Non-working shortcuts if you switch between Wayland and X11 sessions on GNOME. For this, the [GNOME Shell integration extension](https://github.com/kando-menu/gnome-shell-integration) now does deliberately nothing on X11.
+- Wrong menu clamping to the monitor bounds if the menu had been scaled.
 
 ## [Kando 1.7.0](https://github.com/kando-menu/kando/releases/tag/v1.7.0)
 
@@ -92,7 +108,7 @@ This changelog follows the rules of [Keep a Changelog](http://keepachangelog.com
 - If `XDG_SESSION_TYPE` is set to `tty`, Kando will now try to use the X11 backend on Linux instead of refusing to start. In most cases, this should work. But there will be a warning in the console if the X11 backend is used in this case.
 - Improved the length transition of the connector lines of the "Rainbow Labels" theme.
 - Upgraded many dependencies. This could potentially introduce new bugs. Please report any issues you encounter!
-- **Several  translation updates:** Thanks to all the contributors!
+- **Several translation updates:** Thanks to all the contributors!
 
 #### :bug: Fixed
 

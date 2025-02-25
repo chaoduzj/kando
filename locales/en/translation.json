@@ -36,6 +36,15 @@
       "name": "Simulate Macro",
       "description": "Types a keyboard macro."
     },
+    "redirect": {
+      "tip-1": "Use consistent letter case for menu names.",
+      "tip-2": "Avoid empty or undefined menu names.",
+      "tip-3": "Avoid recursive redirects.",
+      "redirect": "Redirect",
+      "redirect-hint": "This menu will be opened",
+      "name": "Redirect",
+      "description": "Opens another menu"
+    },
     "submenu": {
       "tip-1": "Submenus can be used to group items.",
       "tip-2": "You can also nest submenus inside of submenus.",
@@ -74,8 +83,10 @@
   },
   "main": {
     "failed-to-start-header": "Kando failed to start",
+    "show-settings": "Show Settings",
     "un-inhibit-shortcuts": "Re-enable Shortcuts",
-    "inhibit-shortcuts": "Temporarily Disable Shortcuts"
+    "inhibit-shortcuts": "Temporarily Disable Shortcuts",
+    "quit": "Quit"
   },
   "properties": {
     "common": {
@@ -90,6 +101,8 @@
     "advanced-options": {
       "heading": "Tweak the Menu's Behavior",
       "subheading": "Before you enable these options, we recommend learning Kando's default behavior. Read about why we like it <a {{- link}}>here</a>.",
+      "hover-mode": "Hover Mode",
+      "hover-mode-hint": "For power users only! Select items by hovering over them.",
       "centered-mode": "Centered Mode",
       "centered-mode-hint": "Open the menu in the screen's center instead of at the cursor.",
       "warp-mouse": "Warp Mouse in Centered Mode",
