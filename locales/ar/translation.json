@@ -192,7 +192,7 @@
             "open-theme-directory": "فتح مسار السمات",
             "author": "من {{author}}",
             "selection-wedges-info": "إذا تم تمكين هذه الميزة ودعمها بواسطة السمة المختارة، فسيتم تمييز المنطقة القابلة للتحديد من عناصر القائمة.",
-            "selection-wedges": "ارسم أجزاء العناصر"
+            "selection-wedges": "ارسم إطارات العنصر"
         },
         "all-menus": "جميع القوائم",
         "search-menus-placeholder": "بحث القوائم…",
