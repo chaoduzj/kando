@@ -1,0 +1,161 @@
+//////////////////////////////////////////////////////////////////////////////////////////
+//   _  _ ____ _  _ ___  ____                                                           //
+//   |_/  |__| |\ | |  \ |  |    This file belongs to Kando, the cross-platform         //
+//   | \_ |  | | \| |__/ |__|    pie menu. Read more on github.com/kando-menu/kando     //
+//                                                                                      //
+//////////////////////////////////////////////////////////////////////////////////////////
+
+// SPDX-FileCopyrightText: Simon Schneegans <code@simonschneegans.de>
+// SPDX-License-Identifier: MIT
+
+import { expect } from 'chai';
+import fs from 'fs-extra';
+import os from 'os';
+import path from 'path';
+
+import * as IPCTypes from '../src/common/ipc/types';
+import { MenuItem } from '../src/common/';
+import { IPCServer } from '../src/common/ipc/ipc-server';
+import { IPCClient } from '../src/common/ipc/ipc-client';
+
+describe('IPC Protocol', function () {
+  const tmpDir = path.join(os.tmpdir(), 'kando_ipc_test');
+  const infoPath = path.join(tmpDir, 'ipc-info.json');
+  let server: IPCServer;
+
+  beforeEach(async function () {
+    fs.removeSync(tmpDir);
+    fs.ensureDirSync(tmpDir);
+    server = new IPCServer(tmpDir);
+    await server.init();
+  });
+
+  afterEach(function () {
+    server.close();
+    fs.removeSync(tmpDir);
+  });
+
+  it('should create ipc-info.json on server init', function () {
+    expect(fs.existsSync(infoPath)).to.be.true;
+
+    const info = JSON.parse(fs.readFileSync(infoPath, 'utf-8'));
+    expect(info).to.have.property('port');
+    expect(info).to.have.property('apiVersion', 1);
+  });
+
+  it('should fail gracefully if the port is wrong', async function () {
+    const info = JSON.parse(fs.readFileSync(infoPath, 'utf-8'));
+    const client = new IPCClient(info.port + 1, info.apiVersion); // Use a wrong port
+
+    let errorReceived = false;
+
+    try {
+      await client.init();
+    } catch (err) {
+      errorReceived = true;
+      expect(err).to.equal(IPCTypes.IPCErrorReason.eConnectionFailed);
+    }
+
+    expect(errorReceived).to.be.true;
+
+    client.close();
+  });
+
+  it('should not connect to a wrong api version', async function () {
+    const info = JSON.parse(fs.readFileSync(infoPath, 'utf-8'));
+    const client = new IPCClient(info.port, 999); // Use an unsupported API version
+
+    let errorReceived = false;
+
+    try {
+      await client.init();
+    } catch (err) {
+      errorReceived = true;
+      expect(err).to.equal(IPCTypes.IPCErrorReason.eVersionNotSupported);
+    }
+
+    expect(errorReceived).to.be.true;
+
+    client.close();
+  });
+
+  it('should allow show-menu', async function () {
+    const info = JSON.parse(fs.readFileSync(infoPath, 'utf-8'));
+    const client = new IPCClient(info.port, info.apiVersion);
+    await client.init();
+
+    // Listen for show-menu event on server.
+    let menuReceived = false;
+    server.on('show-menu', (menu, callbacks) => {
+      menuReceived = true;
+      expect(menu.name).to.equal('TestMenu');
+
+      // "interact" with the menu.
+      callbacks.onSelection([0, 1]);
+      callbacks.onHover([0, 1, 2]);
+      callbacks.onClose();
+    });
+
+    // Listen for events on client
+    let selectReceived = false;
+    let hoverReceived = false;
+    let closeReceived = false;
+
+    client.on('select', (path) => {
+      expect(path).to.deep.equal([0, 1]);
+      selectReceived = true;
+    });
+
+    client.on('hover', (path) => {
+      expect(path).to.deep.equal([0, 1, 2]);
+      hoverReceived = true;
+    });
+
+    client.on('cancel', () => {
+      closeReceived = true;
+    });
+
+    // Finally "show" the menu.
+    client.showMenu({
+      name: 'TestMenu',
+      type: 'submenu',
+      icon: 'icon',
+      iconTheme: 'iconTheme',
+    });
+
+    // Wait for events to propagate
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // Check that all events were received.
+    expect(menuReceived).to.be.true;
+    expect(selectReceived).to.be.true;
+    expect(hoverReceived).to.be.true;
+    expect(closeReceived).to.be.true;
+
+    client.close();
+  });
+
+  it('should reject a malformed message', async function () {
+    const info = JSON.parse(fs.readFileSync(infoPath, 'utf-8'));
+    const client = new IPCClient(info.port, info.apiVersion);
+    await client.init();
+
+    // Listen for error events on client.
+    let errorReceived = false;
+    client.on('error', (err) => {
+      expect(err).to.equal(IPCTypes.IPCErrorReason.eMalformedRequest);
+      errorReceived = true;
+    });
+
+    // Send a malformed message.
+    client.showMenu({ invalid: 'data' } as unknown as MenuItem);
+
+    // Wait for events to propagate
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // Check that an error was received.
+    expect(errorReceived).to.be.true;
+
+    client.close();
+  });
+});

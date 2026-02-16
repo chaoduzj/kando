@@ -27,10 +27,13 @@ export class IPCMenuManager {
   private ipcClient: IPCClient;
   private lastActions: IPCButtonAction[] = [];
 
-  constructor(clientName: string, port: number, token: string) {
-    this.ipcClient = new IPCClient(clientName, port, token);
+  constructor(serverPort: number, serverApiVersion: number) {
+    this.ipcClient = new IPCClient(serverPort, serverApiVersion);
     this.ipcClient.on('select', (path: number[]) => this.handleSelect(path));
     this.ipcClient.on('cancel', () => this.handleCancel());
+    this.ipcClient.on('error', (err) => {
+      console.error('IPC Client error:', err);
+    });
   }
 
   /** Initializes the IPC client. Must be called before showing menus. */
@@ -66,6 +69,11 @@ export class IPCMenuManager {
     this.ipcClient.showMenu(menu);
   }
 
+  /** Closes the IPC connection. */
+  public close(): void {
+    this.ipcClient.close();
+  }
+
   private handleSelect(path: number[]): void {
     // Only handle one-level menus: path[0] is the index of the selected action.
     if (path.length === 1 && this.lastActions[path[0]]) {
@@ -76,10 +84,5 @@ export class IPCMenuManager {
 
   private handleCancel(): void {
     this.lastActions = [];
-  }
-
-  /** Closes the IPC connection. */
-  public close(): void {
-    this.ipcClient.close();
   }
 }

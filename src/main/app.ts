@@ -201,12 +201,6 @@ export class KandoApp {
     this.ipcServer = new IPCServer(app.getPath('userData'));
     await this.ipcServer.init();
 
-    // For now, we decline all authentication requests. In the future, we will want to
-    // show a dialog to the user to approve or decline the request.
-    this.ipcServer.on('auth-request', (clientName, permissions, respond) => {
-      respond('decline');
-    });
-
     // When a menu is requested via IPC, we show it.
     this.ipcServer.on('show-menu', (menuItem, callbacks) => {
       const menu: MenuType = {
@@ -507,13 +501,12 @@ export class KandoApp {
 
     // Allow the renderer to retrieve information about the current system.
     ipcMain.handle('settings-window.get-system-info', () => {
-      const kandoToken = this.ipcServer.getKandoToken();
       const ipcPort = this.ipcServer.getPort();
+      const ipcApiVersion = this.ipcServer.getApiVersion();
       return {
         supportsIsolatedProcesses: supportsIsolatedProcesses(),
-        ipcClientName: kandoToken.clientName,
-        ipcToken: kandoToken.token,
         ipcPort,
+        ipcApiVersion,
       } as SystemInfo;
     });
 

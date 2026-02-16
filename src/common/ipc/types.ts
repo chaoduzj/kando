@@ -11,29 +11,16 @@
 import * as z from 'zod';
 import { MENU_ITEM_SCHEMA } from '../settings-schemata';
 
-/** Enum of all possible permissions for IPC clients. Extend as needed. */
-export enum IPCPermission {
-  eShowMenu = 'show-menu',
-}
-
-/** Enum of all possible reasons for declining authentication. */
-export enum IPCAuthDeclineReason {
+/** Enum of all possible reasons for declining a request. */
+export enum IPCErrorReason {
+  /** If the client is not connected to the server. */
+  eNotConnected = 'not-connected',
+  /** If the client failed to connect to the server. */
+  eConnectionFailed = 'connection-failed',
   /** If the request was malformed and could not be parsed. */
   eMalformedRequest = 'malformed-request',
-  /** If the client tried to authenticate but has never requested access before. */
-  eUnknownClient = 'unknown-client',
   /** If the requested API version is not supported. */
   eVersionNotSupported = 'version-not-supported',
-  /** If the client did already authenticate but is trying to authenticate again. */
-  eAlreadyAuthenticated = 'already-authenticated',
-  /** If the provided token is invalid. */
-  eInvalidToken = 'invalid-token',
-  /** If the client did not request the previously granted permissions. */
-  eInvalidPermissions = 'invalid-permissions',
-  /** If the client has been blocked from accessing the server. */
-  eClientBlocked = 'client-blocked',
-  /** If the authentication was canceled by the user. Maybe you should try again later. */
-  eCanceled = 'canceled',
 }
 
 /**
@@ -43,47 +30,6 @@ export enum IPCAuthDeclineReason {
 export const IPC_INFO_SCHEMA = z.object({
   port: z.number(),
   apiVersion: z.number(),
-});
-
-/**
- * Sent by the client to authenticate using a previously received token. Should be sent
- * immediately after connecting if the client has a token.
- */
-export const AUTH_MESSAGE = z.object({
-  type: z.literal('auth'),
-  clientName: z.string(),
-  token: z.string(),
-  apiVersion: z.number(),
-});
-
-/**
- * Sent by the client to request authentication if it does not have a token yet. The
- * client specifies its name, requested permissions, and API version.
- */
-export const AUTH_REQUEST_MESSAGE = z.object({
-  type: z.literal('auth-request'),
-  clientName: z.string(),
-  permissions: z.array(z.enum(IPCPermission)),
-  apiVersion: z.number(),
-});
-
-/**
- * Sent by the server in response to a successful authentication or auth request. Contains
- * the token to use for future connections and the granted permissions.
- */
-export const AUTH_ACCEPTED_MESSAGE = z.object({
-  type: z.literal('auth-accepted'),
-  token: z.string(),
-  permissions: z.array(z.enum(IPCPermission)),
-});
-
-/**
- * Sent by the server if authentication or an auth request is declined. The reason field
- * is an enum for localization-agnostic error handling.
- */
-export const AUTH_DECLINED_MESSAGE = z.object({
-  type: z.literal('auth-declined'),
-  reason: z.enum(IPCAuthDeclineReason),
 });
 
 /**
@@ -127,14 +73,11 @@ export const HOVER_ITEM_MESSAGE = z.object({
  */
 export const ERROR_MESSAGE = z.object({
   type: z.literal('error'),
-  error: z.string(),
+  reason: z.enum(IPCErrorReason),
+  description: z.string(),
 });
 
 export type IPCInfo = z.infer<typeof IPC_INFO_SCHEMA>;
-export type AuthMessage = z.infer<typeof AUTH_MESSAGE>;
-export type AuthRequestMessage = z.infer<typeof AUTH_REQUEST_MESSAGE>;
-export type AuthAcceptedMessage = z.infer<typeof AUTH_ACCEPTED_MESSAGE>;
-export type AuthDeclinedMessage = z.infer<typeof AUTH_DECLINED_MESSAGE>;
 export type ShowMenuMessage = z.infer<typeof SHOW_MENU_MESSAGE>;
 export type CloseMenuMessage = z.infer<typeof CLOSE_MENU_MESSAGE>;
 export type SelectItemMessage = z.infer<typeof SELECT_ITEM_MESSAGE>;
@@ -142,10 +85,6 @@ export type HoverItemMessage = z.infer<typeof HOVER_ITEM_MESSAGE>;
 export type ErrorMessage = z.infer<typeof ERROR_MESSAGE>;
 
 export const IPC_MESSAGES = [
-  AUTH_MESSAGE,
-  AUTH_REQUEST_MESSAGE,
-  AUTH_ACCEPTED_MESSAGE,
-  AUTH_DECLINED_MESSAGE,
   SHOW_MENU_MESSAGE,
   CLOSE_MENU_MESSAGE,
   SELECT_ITEM_MESSAGE,

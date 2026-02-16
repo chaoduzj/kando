@@ -13,7 +13,6 @@ import WebSocket, { WebSocketServer } from 'ws';
 import { AddressInfo } from 'net';
 import fs from 'fs';
 import path from 'path';
-import { IPCAuth } from './ipc-auth';
 import * as IPCTypes from './types';
 
 import { TypedEventEmitter, MenuItem } from '..';
@@ -29,12 +28,6 @@ type IPCServerEvents = {
       onClose: () => void;
     },
   ];
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  'auth-request': [
-    clientName: string,
-    permissions: IPCTypes.IPCPermission[],
-    respond: (decision: 'accept' | 'decline' | 'cancel') => void,
-  ];
 };
 
 /**
@@ -44,9 +37,9 @@ type IPCServerEvents = {
  *
  * This class is an event emitter that emits the following events:
  *
- * - 'show-menu': Emitted when a valid show-menu request is received from an authenticated
- *   client. The event handler receives the menu to show and callbacks for selection,
- *   hover, and close events.
+ * - 'show-menu': Emitted when a valid show-menu request is received from a client. The
+ *   event handler receives the menu to show and callbacks for selection, hover, and close
+ *   events.
  */
 export class IPCServer extends (EventEmitter as new () => TypedEventEmitter<IPCServerEvents>) {
   /** The protocol version supported by this server. Clients must match this version. */
@@ -54,24 +47,19 @@ export class IPCServer extends (EventEmitter as new () => TypedEventEmitter<IPCS
 
   private wss: WebSocketServer | undefined;
   private port: number | undefined;
-  private auth: IPCAuth;
   private infoPath: string;
 
   /**
    * Creates a new IPCServer. Call init() to start listening for connections.
    *
-   * @param infoDir The directory where ipc-info.json with the port info will be stored
-   *   and where the ipc-tokens.json file will be created. Usually, this is Kando's config
-   *   directory.
+   * @param infoDir The directory where ipc-info.json with the port info will be stored.
+   *   Usually, this is Kando's config directory.
    */
   constructor(private infoDir: string) {
     super();
 
     // Path to the file where the server writes its port for clients to discover.
     this.infoPath = path.join(this.infoDir, 'ipc-info.json');
-
-    // Handles authentication and token management for IPC clients.
-    this.auth = new IPCAuth(this.infoDir);
   }
 
   /**
@@ -118,14 +106,14 @@ export class IPCServer extends (EventEmitter as new () => TypedEventEmitter<IPCS
     }
   }
 
-  /** Returns the token for Kando's own IPC client. */
-  public getKandoToken() {
-    return this.auth.getKandoToken();
-  }
-
   /** Returns the port the server is listening on. */
   public getPort(): number {
     return this.port;
+  }
+
+  /** Returns the API version supported by this server. */
+  public getApiVersion(): number {
+    return IPCServer.cAPIVersion;
   }
 
   /**
@@ -133,18 +121,14 @@ export class IPCServer extends (EventEmitter as new () => TypedEventEmitter<IPCS
    *
    * This method is responsible for:
    *
-   * - Authenticating the client using either an auth or auth-request message.
    * - Validating all incoming messages using zod schemas.
    * - Emitting 'show-menu' events for valid show-menu requests, with callbacks for menu
    *   selection, hover, and close events.
-   * - Sending appropriate error messages for malformed or unauthorized requests.
+   * - Sending appropriate error messages for malformed requests.
    *
    * @param ws The connected WebSocket instance.
    */
   private handleConnection(ws: WebSocket) {
-    let authenticated = false;
-    let clientName: string | null = null;
-
     ws.on('message', (data) => {
       let msg: unknown;
       try {
@@ -152,145 +136,15 @@ export class IPCServer extends (EventEmitter as new () => TypedEventEmitter<IPCS
         msg = JSON.parse(data.toString());
       } catch (e) {
         // If parsing fails, send an error message and return.
-        const errorMsg: IPCTypes.ErrorMessage = { type: 'error', error: 'Invalid JSON' };
+        const errorMsg: IPCTypes.ErrorMessage = {
+          type: 'error',
+          reason: IPCTypes.IPCErrorReason.eMalformedRequest,
+          description: e.toString(),
+        };
         ws.send(JSON.stringify(errorMsg));
         return;
       }
 
-      // ----------------------
-      // AUTHENTICATION
-      // ----------------------
-      // Handle 'auth' messages: client provides a token for authentication.
-      const authParse = IPCTypes.AUTH_MESSAGE.safeParse(msg);
-      if (authParse.success) {
-        const authMsg = authParse.data;
-        // Check protocol version compatibility.
-        if (authMsg.apiVersion !== IPCServer.cAPIVersion) {
-          const declined: IPCTypes.AuthDeclinedMessage = {
-            type: 'auth-declined',
-            reason: IPCTypes.IPCAuthDeclineReason.eVersionNotSupported,
-          };
-          ws.send(JSON.stringify(declined));
-          return;
-        }
-
-        // Validate the provided token and client name.
-        const authResult = this.auth.isClientAuthenticated(
-          authMsg.clientName,
-          authMsg.token
-        );
-
-        if (!authResult.authenticated) {
-          const declined: IPCTypes.AuthDeclinedMessage = {
-            type: 'auth-declined',
-            reason: authResult.reason,
-          };
-          ws.send(JSON.stringify(declined));
-          return;
-        }
-
-        // Authentication successful.
-        authenticated = true;
-        clientName = authMsg.clientName;
-        const accepted: IPCTypes.AuthAcceptedMessage = {
-          type: 'auth-accepted',
-          token: authMsg.token,
-          permissions: this.auth.getPermissions(clientName),
-        };
-        ws.send(JSON.stringify(accepted));
-        return;
-      }
-
-      // ----------------------
-      // AUTH REQUEST
-      // ----------------------
-      // Handle 'auth-request' messages: client requests a new token.
-      const authReqParse = IPCTypes.AUTH_REQUEST_MESSAGE.safeParse(msg);
-      if (authReqParse.success) {
-        const authReqMsg = authReqParse.data;
-        // Check protocol version compatibility.
-        if (authReqMsg.apiVersion !== IPCServer.cAPIVersion) {
-          const declined: IPCTypes.AuthDeclinedMessage = {
-            type: 'auth-declined',
-            reason: IPCTypes.IPCAuthDeclineReason.eVersionNotSupported,
-          };
-          ws.send(JSON.stringify(declined));
-          return;
-        }
-
-        // Check if the client is blocked.
-        if (this.auth.isClientBlocked(authReqMsg.clientName)) {
-          const declined: IPCTypes.AuthDeclinedMessage = {
-            type: 'auth-declined',
-            reason: IPCTypes.IPCAuthDeclineReason.eClientBlocked,
-          };
-          ws.send(JSON.stringify(declined));
-          return;
-        }
-
-        // Check if the client is already authenticated.
-        if (this.auth.isKnownClient(authReqMsg.clientName)) {
-          const declined: IPCTypes.AuthDeclinedMessage = {
-            type: 'auth-declined',
-            reason: IPCTypes.IPCAuthDeclineReason.eAlreadyAuthenticated,
-          };
-          ws.send(JSON.stringify(declined));
-          return;
-        }
-
-        // Emit 'auth-request' event and wait for user decision
-        this.emit(
-          'auth-request',
-          authReqMsg.clientName,
-          authReqMsg.permissions,
-          (decision: 'accept' | 'decline' | 'cancel') => {
-            if (decision === 'accept') {
-              const token = this.auth.acceptAuth(
-                authReqMsg.clientName,
-                authReqMsg.permissions
-              );
-              authenticated = true;
-              clientName = authReqMsg.clientName;
-              const accepted: IPCTypes.AuthAcceptedMessage = {
-                type: 'auth-accepted',
-                token,
-                permissions: authReqMsg.permissions,
-              };
-              ws.send(JSON.stringify(accepted));
-            } else if (decision === 'decline') {
-              const declined: IPCTypes.AuthDeclinedMessage = {
-                type: 'auth-declined',
-                reason: IPCTypes.IPCAuthDeclineReason.eClientBlocked,
-              };
-              ws.send(JSON.stringify(declined));
-            } else if (decision === 'cancel') {
-              const declined: IPCTypes.AuthDeclinedMessage = {
-                type: 'auth-declined',
-                reason: IPCTypes.IPCAuthDeclineReason.eCanceled,
-              };
-              ws.send(JSON.stringify(declined));
-            }
-          }
-        );
-        return;
-      }
-
-      // ----------------------
-      // ALL OTHER MESSAGES REQUIRE AUTHENTICATION
-      // ----------------------
-      // If the client is not authenticated, reject all other messages.
-      if (!authenticated || !clientName) {
-        const declined: IPCTypes.ErrorMessage = {
-          type: 'error',
-          error: 'Not authenticated',
-        };
-        ws.send(JSON.stringify(declined));
-        return;
-      }
-
-      // ----------------------
-      // SHOW MENU
-      // ----------------------
       // Handle 'show-menu' messages: client requests to show a menu.
       const showMenuParse = IPCTypes.SHOW_MENU_MESSAGE.safeParse(msg);
       if (showMenuParse.success) {
@@ -313,13 +167,11 @@ export class IPCServer extends (EventEmitter as new () => TypedEventEmitter<IPCS
         return;
       }
 
-      // ----------------------
-      // UNKNOWN OR MALFORMED MESSAGE
-      // ----------------------
       // If the message type is not recognized, send an error.
       const errorMsg: IPCTypes.ErrorMessage = {
         type: 'error',
-        error: 'Unknown or malformed message',
+        reason: IPCTypes.IPCErrorReason.eMalformedRequest,
+        description: 'Unknown or malformed message',
       };
       ws.send(JSON.stringify(errorMsg));
     });

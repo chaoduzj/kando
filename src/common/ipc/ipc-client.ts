@@ -34,17 +34,18 @@ type IPCClientEvents = {
   select: [path: number[]];
   cancel: [];
   hover: [path: number[]];
+  error: [error: IPCTypes.IPCErrorReason];
 };
 
 /**
  * IPCClient provides a reference implementation for connecting to the Kando IPC server
- * via WebSockets. It handles authentication, menu requests, and event emission for menu
- * interactions. This class is used by Kando itself to show menus from the settings
- * renderer process and can serve as a template for plugin authors.
+ * via WebSockets. It handles menu requests and event emission for menu interactions. This
+ * class is used by Kando itself to show menus from the settings renderer process and can
+ * serve as a template for plugin authors.
  *
  * Usage:
  *
- *     const client = new IPCClient('My Cool App', '/path/to/kando/config');
+ *     const client = new IPCClient(12345); // Port must match the one in ipc-info.json
  *     await client.init();
  *     client.showMenu(menuItem);
  *     client.on('select', (path) => { ... });
@@ -53,113 +54,90 @@ type IPCClientEvents = {
  */
 export class IPCClient extends (EventEmitter as new () => TypedEventEmitter<IPCClientEvents>) {
   private ws: CrossWebSocket | null = null;
-  private authenticated = false;
+
+  /**
+   * This is the API version of the client. For now, there is only version 1, but this
+   * allows for future compatibility checks if the protocol evolves.
+   */
+  private clientApiVersion = 1;
 
   /**
    * Constructs a new IPCClient instance.
    *
-   * @param clientName The name of the client. Used for authentication and identification.
-   *   This will be shown to users when they approve or deny access.
-   * @param port The port used by the IPC server.
-   * @param token Optional authentication token. If not provided, a new one will be
-   *   requested. However, if the user has previously denied access, this will fail.
+   * @param serverPort The port used by the IPC server.
+   * @param serverApiVersion The API version supported by the server, for compatibility
+   *   checks.
    */
   constructor(
-    private clientName: string,
-    private port: number,
-    private token?: string
+    private serverPort: number,
+    private serverApiVersion: number
   ) {
     super();
   }
 
   /**
-   * Initializes the IPC client by reading the port from ipc-info.json, connecting to the
-   * WebSocket server, and performing authentication. Resolves with the token and granted
-   * permissions if authentication succeeds, or rejects with the decline reason if it
-   * fails.
+   * Initializes the IPC client by connecting to the WebSocket server. Resolves if the
+   * connection is established, or rejects with the decline reason if it fails.
    *
-   * @returns A promise resolving to an object containing the token and permissions.
-   * @throws If the ipc-info.json file is missing, or authentication fails.
+   * @returns A promise resolving when the connection is established.
    */
-  public async init(): Promise<{ token: string; permissions: IPCTypes.IPCPermission[] }> {
-    this.ws = new crossWebSocket(`ws://127.0.0.1:${this.port}`) as CrossWebSocket;
-    return new Promise<{ token: string; permissions: IPCTypes.IPCPermission[] }>(
-      (resolve, reject) => {
-        let authResolved = false;
-        const ws = this.ws!;
-        ws.onopen = () => handleOpen();
-        ws.onmessage = (event: { data: string }) => handleMessage(event.data);
-        ws.onerror = (event: unknown) => handleError(event);
-
-        const handleOpen = (): void => {
-          if (this.token) {
-            const authMsg: IPCTypes.AuthMessage = {
-              type: 'auth',
-              clientName: this.clientName,
-              token: this.token,
-              apiVersion: 1,
-            };
-            ws.send(JSON.stringify(authMsg));
-          } else {
-            const authReqMsg: IPCTypes.AuthRequestMessage = {
-              type: 'auth-request',
-              clientName: this.clientName,
-              permissions: [IPCTypes.IPCPermission.eShowMenu],
-              apiVersion: 1,
-            };
-            ws.send(JSON.stringify(authReqMsg));
-          }
-        };
-
-        const handleMessage = (data: string): void => {
-          const msg = JSON.parse(data);
-          // Handle authentication responses.
-          if (!this.authenticated && !authResolved) {
-            const acceptedParse = IPCTypes.AUTH_ACCEPTED_MESSAGE.safeParse(msg);
-            if (acceptedParse.success) {
-              this.token = acceptedParse.data.token;
-              this.authenticated = true;
-              authResolved = true;
-              resolve({ token: this.token, permissions: acceptedParse.data.permissions });
-              return;
-            }
-            const declinedParse = IPCTypes.AUTH_DECLINED_MESSAGE.safeParse(msg);
-            if (declinedParse.success) {
-              authResolved = true;
-              reject(declinedParse.data.reason);
-              return;
-            }
-          }
-          // Handle menu events (after authentication).
-          if (this.authenticated) {
-            if (IPCTypes.SELECT_ITEM_MESSAGE.safeParse(msg).success) {
-              this.emit('select', (msg as IPCTypes.SelectItemMessage).path);
-            } else if (IPCTypes.CLOSE_MENU_MESSAGE.safeParse(msg).success) {
-              this.emit('cancel');
-            } else if (IPCTypes.HOVER_ITEM_MESSAGE.safeParse(msg).success) {
-              this.emit('hover', (msg as IPCTypes.HoverItemMessage).path);
-            }
-          }
-        };
-
-        const handleError = (err: unknown): void => {
-          if (!authResolved) {
-            reject(err);
-          }
-        };
+  public async init(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (this.clientApiVersion !== this.serverApiVersion) {
+        reject(IPCTypes.IPCErrorReason.eVersionNotSupported);
+        return;
       }
-    );
+
+      this.ws = new crossWebSocket(`ws://127.0.0.1:${this.serverPort}`) as CrossWebSocket;
+      let connectionEstablished = false;
+
+      this.ws.onopen = () => handleOpen();
+      this.ws.onmessage = (event: { data: string }) => handleMessage(event.data);
+      this.ws.onerror = () => handleError();
+
+      const handleOpen = (): void => {
+        connectionEstablished = true;
+        resolve();
+      };
+
+      const handleMessage = (data: string): void => {
+        const msg = JSON.parse(data);
+
+        if (IPCTypes.SELECT_ITEM_MESSAGE.safeParse(msg).success) {
+          this.emit('select', (msg as IPCTypes.SelectItemMessage).path);
+        } else if (IPCTypes.CLOSE_MENU_MESSAGE.safeParse(msg).success) {
+          this.emit('cancel');
+        } else if (IPCTypes.HOVER_ITEM_MESSAGE.safeParse(msg).success) {
+          this.emit('hover', (msg as IPCTypes.HoverItemMessage).path);
+        } else if (IPCTypes.ERROR_MESSAGE.safeParse(msg).success) {
+          const errorMsg = msg as IPCTypes.ErrorMessage;
+          console.error(`IPC Error (${errorMsg.reason}): ${errorMsg.description}`);
+          this.emit('error', errorMsg.reason);
+        }
+      };
+
+      const handleError = (): void => {
+        if (!connectionEstablished) {
+          this.ws = null;
+          reject(IPCTypes.IPCErrorReason.eConnectionFailed);
+        } else {
+          this.emit('error', IPCTypes.IPCErrorReason.eMalformedRequest);
+        }
+      };
+    });
   }
 
   /**
    * Sends a show-menu request to the IPC server. The menu structure must conform to the
-   * MenuItem type. Throws if not connected or authenticated.
+   * MenuItem type. Emits the 'error' event if the request is malformed or if the client
+   * is not connected.
    *
    * @param menu The menu structure to show, as a MenuItem object.
    */
   public showMenu(menu: MenuItem): void {
-    if (!this.ws || !this.authenticated) {
-      throw new Error('Not connected or authenticated');
+    if (!this.ws) {
+      this.emit('error', IPCTypes.IPCErrorReason.eNotConnected);
+      return;
     }
     this.ws.send(JSON.stringify({ type: 'show-menu', menu }));
   }

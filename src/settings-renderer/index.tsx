@@ -134,11 +134,7 @@ Promise.all([
     // Initialize IPCMenuManager globally and attach to window ---------------------------
 
     try {
-      window.ipcAPI = new IPCMenuManager(
-        systemInfo.ipcClientName,
-        systemInfo.ipcPort,
-        systemInfo.ipcToken
-      );
+      window.ipcAPI = new IPCMenuManager(systemInfo.ipcPort, systemInfo.ipcApiVersion);
       await window.ipcAPI.init();
     } catch (e) {
       console.error('Failed to initialize IPCMenuManager:', e);

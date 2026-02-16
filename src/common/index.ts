@@ -125,20 +125,11 @@ export type SystemInfo = {
   /** Whether the system supports launching isolated processes. */
   readonly supportsIsolatedProcesses: boolean;
 
-  /**
-   * The IPC client name when opening custom menus from the settings process using Kando's
-   * own IPC show-menu interface.
-   */
-  readonly ipcClientName: string;
-
   /** The IPC port used by Kando's own IPC show-menu interface. */
   readonly ipcPort: number;
 
-  /**
-   * The IPC token used to authenticate the IPC client when opening custom menus from the
-   * settings process using Kando's own IPC show-menu interface.
-   */
-  readonly ipcToken: string;
+  /** The API version supported by Kando's own IPC show-menu interface. */
+  readonly ipcApiVersion: number;
 };
 
 /** This type describes a icon theme consisting of a collection of icon files. */
