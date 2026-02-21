@@ -204,7 +204,8 @@
     },
     "achievements": {
         "added-items": {
-            "description": "Snulfu-d {{n}} n yiferdisen deg umaẓrag n wumuɣ."
+            "description": "Snulfu-d {{n}} n yiferdisen deg umaẓrag n wumuɣ.",
+            "name": "Tarrayt n Kando {{tier}}"
         },
         "deleted-all-menus": {
             "name": "Sfeḍ Aduju",
@@ -219,13 +220,16 @@
             "description": "Rnu aferdis n wumuɣ ɣer wumuɣ anaddaw yesɛan kuẓ n yiswiren."
         },
         "sponsors-viewed": {
-            "name": "Aɛessas n Kando"
+            "name": "Aɛessas n Kando",
+            "description": "Xemmem ad teqqleḍ d aṣpunṣur n Kando."
         },
         "menu-themes-selected": {
-            "description": "Senfel asentel n wumuɣ {{n}} n tikkal."
+            "description": "Senfel asentel n wumuɣ {{n}} n tikkal.",
+            "name": "Tarrayt n Wucbiḥ"
         },
         "tutorial-viewed": {
-            "name": "Yebda-d usikel"
+            "name": "Yebda-d usikel",
+            "description": "Fak adlisfus n unekcum n Kando."
         },
         "many-selections-streak": {
             "name": "Ifassen n lebraq {{tier}}",
@@ -235,7 +239,21 @@
             "name": "D arurad ugar ɣef uxemmem {{tier}}",
             "description": "Egg {{n}} n ifran uḍfiren deg tlemmast s tɣawla ugar n {{time}} n tasinin."
         },
-        "completed-title": "Iswi yettwarẓem!"
+        "completed-title": "Iswi yettwarẓem!",
+        "gesture-selector": {
+            "description": "Fren {{n}} n yiferdisen s uskar turbu neɣ n ucraḍ."
+        },
+        "settings-opened": {
+            "name": "D asikel i d araz {{tier}}",
+            "description": "Ldi tankult n udiwenni n yiɣewwaṛen {{n}} n tikkal."
+        },
+        "backup": {
+            "description": "Ḥrez iɣewwaṛen neɣ umuɣen-ik·im {{n}} n tikkal."
+        },
+        "restore": {
+            "name": "Tagnit tis snat {{tier}}",
+            "description": "Err-d aḥras {{n}} n tikkal."
+        }
     },
     "main": {
         "new-version-notification-header": "Yella lqem amaynut n Kando!",
@@ -284,7 +302,23 @@
             "previous-track": "Tazribt tuzwirt"
         },
         "windows": {
-            "submenu": "Isfuyla"
+            "submenu": "Isfuyla",
+            "mission-control": "Asenqed n tuɣdaḍt",
+            "toggle-maximize": "Qluqel asemɣer afellay",
+            "tile-right": "Fser ɣer uyeffus",
+            "close-window": "Mdel Asfaylu",
+            "tile-left": "Fser ɣer uzelmaḍ"
+        },
+        "previous-workspace": "Tallunt n umahil tuzwirt",
+        "bookmarks": {
+            "submenu": "isɣalen",
+            "downloads": "Isidar",
+            "videos": "Ividyuten",
+            "pictures": "Tiwlafin",
+            "documents": "Isemliyen",
+            "desktop": "Tanarit",
+            "home": "Agejdan",
+            "music": "Aẓawan"
         }
     }
 }
