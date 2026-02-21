@@ -27,10 +27,12 @@ This changelog follows the rules of [Keep a Changelog](http://keepachangelog.com
 - Added the possibility to temporarily disable all Kando shortcuts while simulating hotkeys or executing macros. This is useful if you want to use a shortcut which is also used by Kando to trigger a menu. Surprisingly, this required a complete rewrite of how the binding of shortcuts works, so feel free to report any issues you encounter with shortcuts!
 - Added an option to disable achievement notifications. This can be found in the general settings dialog.
 - Some wlroots-specific options to handle the case where no pointer position is available. There are some timeouts which can now be configured in the settings dialog. Thanks to [@make-42](https://github.com/make-42) for this contribution!
+- Many translation updates: **Thanks to all the contributors!**
 
 ### :wrench: Changed
 
 - Upgraded many dependencies to their latest versions. This includes an upgrade to Electron 40 which uses Wayland natively now on Linux. Feel free to report any issues you encounter!
+- Pinned all GitHub Actions to specific commit SHAs to increase the security of the build process. Thanks to [@pgoslatara](https://github.com/pgoslatara) for this contribution!
 
 ### :bug: Fixed
 
