@@ -62,6 +62,7 @@ Promise.all([
   ]) => {
     // Initialize i18next with the current locale and the english fallback locale.
     await i18next.init({
+      showSupportNotice: false,
       lng: locales.current,
       fallbackLng: locales.fallbackLng,
     });

@@ -215,6 +215,7 @@ try {
     .then(() => {
       const locale = generalSettings.get('locale');
       return i18next.use(i18Backend).init({
+        showSupportNotice: false,
         lng: locale === 'auto' ? app.getLocale() : locale,
         fallbackLng: {
           /* eslint-disable @typescript-eslint/naming-convention */
