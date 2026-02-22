@@ -138,7 +138,9 @@
             "wlroots-pointer-get-timeout-default-behavior-info": "يحدد هذا الخيار المكان الذي يجب افتراض وجود المؤشر فيه إذا لم يكن من الممكن الحصول على أي موضع من الخوادم الخلفية المستندة إلى wlroots خلال المهلة الزمنية المحددة.",
             "wlroots-pointer-get-timeout-default-behavior": "وضع احتياطي للمؤشر",
             "center": "المركز",
-            "previously-reported": "سبق الإبلاغ عنه"
+            "previously-reported": "سبق الإبلاغ عنه",
+            "windows-ink-workaround-info": "يُتيح هذا حلاً بديلاً لمشكلة عدم إمكانية تحديد موضع القلم عند تفعيل ميزة Windows Ink. يُضيف هذا تأخيرًا قدره 100 مللي ثانية قبل فتح القائمة، لذا إذا كنت لا تستخدم قلمًا، يمكنك تعطيله لتسريع فتح القائمة.",
+            "windows-ink-workaround": "حل بديل لـ Windows Ink"
         },
         "introduction-dialog": {
             "slide1-title": "كاندو يوفر وسيلة فريدة وفعالة للتفاعل مع جهاز الكمبيوتر الخاص بك.",
