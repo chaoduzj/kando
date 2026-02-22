@@ -8,5 +8,20 @@
 // SPDX-FileCopyrightText: Simon Schneegans <code@simonschneegans.de>
 // SPDX-License-Identifier: MIT
 
-export { IPCServer } from './ipc-server';
-export { IPCShowMenuClient } from './ipc-show-menu-client';
+/**
+ * Selects the appropriate WebSocket implementation for Node.js or browser/Electron
+ * renderer.
+ */
+export function createCrossWebSocket(url: string): {
+  send(data: string): void;
+  close(): void;
+  onopen?: () => void;
+  onmessage?: (event: { data: string }) => void;
+  onerror?: (event: unknown) => void;
+} {
+  const WebSocketImpl =
+    typeof window !== 'undefined' && typeof window.WebSocket !== 'undefined'
+      ? window.WebSocket
+      : require('ws');
+  return new WebSocketImpl(url);
+}

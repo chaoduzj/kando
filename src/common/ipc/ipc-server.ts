@@ -25,9 +25,19 @@ type IPCServerEvents = {
     callbacks: {
       onSelection: (path: number[]) => void;
       onHover: (path: number[]) => void;
-      onClose: () => void;
+      onCancel: () => void;
     },
   ];
+  'start-observing': [
+    observerID: number,
+    callbacks: {
+      onOpen: () => void;
+      onSelection: (path: number[]) => void;
+      onHover: (path: number[]) => void;
+      onCancel: () => void;
+    },
+  ];
+  'stop-observing': [observerID: number];
 };
 
 /**
@@ -45,9 +55,30 @@ export class IPCServer extends (EventEmitter as new () => TypedEventEmitter<IPCS
   /** The protocol version supported by this server. Clients must match this version. */
   private static readonly cAPIVersion = 1;
 
+  /**
+   * The WebSocket server instance. It is initialized in init() and closed in close(). It
+   * is undefined when the server is not running.
+   */
   private wss: WebSocketServer | undefined;
+
+  /**
+   * The port the server is listening on. It is assigned by the OS when the server starts
+   * (port 0) and is written to ipc-info.json for clients to discover. It is undefined
+   * until the server is initialized.
+   */
   private port: number | undefined;
+
+  /**
+   * The path to the ipc-info.json file where the server writes its port and API version
+   * for clients to discover. It is derived from the infoDir provided in the constructor.
+   */
   private infoPath: string;
+
+  /**
+   * Whenever a client registers as an observer, it is assigned a unique observer ID. This
+   * counter is used to generate those IDs.
+   */
+  private nextObserverID = 1;
 
   /**
    * Creates a new IPCServer. Call init() to start listening for connections.
@@ -129,6 +160,8 @@ export class IPCServer extends (EventEmitter as new () => TypedEventEmitter<IPCS
    * @param ws The connected WebSocket instance.
    */
   private handleConnection(ws: WebSocket) {
+    let observerID = -1; // Will be assigned if the client registers as an observer.
+
     ws.on('message', (data) => {
       let msg: unknown;
       try {
@@ -159,11 +192,66 @@ export class IPCServer extends (EventEmitter as new () => TypedEventEmitter<IPCS
             const hoverMsg: IPCTypes.HoverItemMessage = { type: 'hover-item', path };
             ws.send(JSON.stringify(hoverMsg));
           },
-          onClose: () => {
-            const closeMsg: IPCTypes.CloseMenuMessage = { type: 'close-menu' };
-            ws.send(JSON.stringify(closeMsg));
+          onCancel: () => {
+            const cancelMsg: IPCTypes.CancelMenuMessage = { type: 'cancel-menu' };
+            ws.send(JSON.stringify(cancelMsg));
           },
         });
+        return;
+      }
+
+      // Handle 'start-observing' messages: client wants to observe menu events.
+      const startObservingParse = IPCTypes.START_OBSERVING_MESSAGE.safeParse(msg);
+      if (startObservingParse.success) {
+        // If the client is already an observer, send an error message and return.
+        if (observerID !== -1) {
+          const errorMsg: IPCTypes.ErrorMessage = {
+            type: 'error',
+            reason: IPCTypes.IPCErrorReason.eAlreadyObserving,
+            description: 'Client is already registered as an observer',
+          };
+          ws.send(JSON.stringify(errorMsg));
+          return;
+        }
+
+        observerID = this.nextObserverID++;
+        this.emit('start-observing', observerID, {
+          onOpen: () => {
+            const openMsg: IPCTypes.OpenMenuMessage = { type: 'open-menu' };
+            ws.send(JSON.stringify(openMsg));
+          },
+          onSelection: (path: number[]) => {
+            const selectMsg: IPCTypes.SelectItemMessage = { type: 'select-item', path };
+            ws.send(JSON.stringify(selectMsg));
+          },
+          onHover: (path: number[]) => {
+            const hoverMsg: IPCTypes.HoverItemMessage = { type: 'hover-item', path };
+            ws.send(JSON.stringify(hoverMsg));
+          },
+          onCancel: () => {
+            const cancelMsg: IPCTypes.CancelMenuMessage = { type: 'cancel-menu' };
+            ws.send(JSON.stringify(cancelMsg));
+          },
+        });
+        return;
+      }
+
+      // Handle 'stop-observing' messages: client wants to stop observing menu events.
+      const stopObservingParse = IPCTypes.STOP_OBSERVING_MESSAGE.safeParse(msg);
+      if (stopObservingParse.success) {
+        // If the client is not currently an observer, send an error message and return.
+        if (observerID === -1) {
+          const errorMsg: IPCTypes.ErrorMessage = {
+            type: 'error',
+            reason: IPCTypes.IPCErrorReason.eNotObserving,
+            description: 'Client is not registered as an observer',
+          };
+          ws.send(JSON.stringify(errorMsg));
+          return;
+        }
+
+        this.emit('stop-observing', observerID);
+        observerID = -1;
         return;
       }
 
@@ -174,6 +262,13 @@ export class IPCServer extends (EventEmitter as new () => TypedEventEmitter<IPCS
         description: 'Unknown or malformed message',
       };
       ws.send(JSON.stringify(errorMsg));
+    });
+
+    // Stop observing if the client disconnects.
+    ws.on('close', () => {
+      if (observerID !== -1) {
+        this.emit('stop-observing', observerID);
+      }
     });
   }
 }

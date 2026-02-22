@@ -12,48 +12,34 @@ import { EventEmitter } from 'events';
 
 import * as IPCTypes from './types';
 import { TypedEventEmitter, MenuItem } from '..';
-
-// Select the appropriate WebSocket implementation for Node.js or browser/Electron renderer.
-const crossWebSocket =
-  typeof window !== 'undefined' && typeof window.WebSocket !== 'undefined'
-    ? window.WebSocket
-    : require('ws');
-
-// Define a minimal cross-environment WebSocket type
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-type CrossWebSocket = {
-  send(data: string): void;
-  close(): void;
-  onopen?: () => void;
-  onmessage?: (event: { data: string }) => void;
-  onerror?: (event: unknown) => void;
-};
+import { createCrossWebSocket } from './cross-websocket';
 
 /** These events are emitted by the IPC client when menu interactions occur. */
-type IPCClientEvents = {
-  select: [path: number[]];
+type IPCShowMenuClientEvents = {
   cancel: [];
+  select: [path: number[]];
   hover: [path: number[]];
   error: [error: IPCTypes.IPCErrorReason];
 };
 
 /**
- * IPCClient provides a reference implementation for connecting to the Kando IPC server
- * via WebSockets. It handles menu requests and event emission for menu interactions. This
- * class is used by Kando itself to show menus from the settings renderer process and can
- * serve as a template for plugin authors.
+ * IPCShowMenuClient provides a reference implementation for connecting to the Kando IPC
+ * server via WebSockets in order to open custom menus. It handles menu requests and event
+ * emission for menu interactions. This class is used by Kando itself to show menus from
+ * the settings renderer process and can serve as a template for plugin authors.
  *
  * Usage:
  *
- *     const client = new IPCClient(12345); // Port must match the one in ipc-info.json
+ *     // Port and API version must match the one in ipc-info.json
+ *     const client = new IPCShowMenuClient(12345, 1);
  *     await client.init();
  *     client.showMenu(menuItem);
  *     client.on('select', (path) => { ... });
  *     client.on('cancel', () => { ... });
  *     client.on('hover', (path) => { ... });
  */
-export class IPCClient extends (EventEmitter as new () => TypedEventEmitter<IPCClientEvents>) {
-  private ws: CrossWebSocket | null = null;
+export class IPCShowMenuClient extends (EventEmitter as new () => TypedEventEmitter<IPCShowMenuClientEvents>) {
+  private ws: ReturnType<typeof createCrossWebSocket> | null = null;
 
   /**
    * This is the API version of the client. For now, there is only version 1, but this
@@ -62,7 +48,7 @@ export class IPCClient extends (EventEmitter as new () => TypedEventEmitter<IPCC
   private clientApiVersion = 1;
 
   /**
-   * Constructs a new IPCClient instance.
+   * Constructs a new IPCShowMenuClient instance.
    *
    * @param serverPort The port used by the IPC server.
    * @param serverApiVersion The API version supported by the server, for compatibility
@@ -88,7 +74,7 @@ export class IPCClient extends (EventEmitter as new () => TypedEventEmitter<IPCC
         return;
       }
 
-      this.ws = new crossWebSocket(`ws://127.0.0.1:${this.serverPort}`) as CrossWebSocket;
+      this.ws = createCrossWebSocket(`ws://127.0.0.1:${this.serverPort}`);
       let connectionEstablished = false;
 
       this.ws.onopen = () => handleOpen();
@@ -105,7 +91,7 @@ export class IPCClient extends (EventEmitter as new () => TypedEventEmitter<IPCC
 
         if (IPCTypes.SELECT_ITEM_MESSAGE.safeParse(msg).success) {
           this.emit('select', (msg as IPCTypes.SelectItemMessage).path);
-        } else if (IPCTypes.CLOSE_MENU_MESSAGE.safeParse(msg).success) {
+        } else if (IPCTypes.CANCEL_MENU_MESSAGE.safeParse(msg).success) {
           this.emit('cancel');
         } else if (IPCTypes.HOVER_ITEM_MESSAGE.safeParse(msg).success) {
           this.emit('hover', (msg as IPCTypes.HoverItemMessage).path);

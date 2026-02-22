@@ -14,11 +14,11 @@ import os from 'os';
 import path from 'path';
 
 import * as IPCTypes from '../src/common/ipc/types';
-import { MenuItem } from '../src/common/';
+import { MenuItem } from '../src/common';
 import { IPCServer } from '../src/common/ipc/ipc-server';
-import { IPCClient } from '../src/common/ipc/ipc-client';
+import { IPCShowMenuClient } from '../src/common/ipc/ipc-show-menu-client';
 
-describe('IPC Protocol', function () {
+describe('IPC Show-Menu Protocol', function () {
   const tmpDir = path.join(os.tmpdir(), 'kando_ipc_test');
   const infoPath = path.join(tmpDir, 'ipc-info.json');
   let server: IPCServer;
@@ -45,7 +45,7 @@ describe('IPC Protocol', function () {
 
   it('should fail gracefully if the port is wrong', async function () {
     const info = JSON.parse(fs.readFileSync(infoPath, 'utf-8'));
-    const client = new IPCClient(info.port + 1, info.apiVersion); // Use a wrong port
+    const client = new IPCShowMenuClient(info.port + 1, info.apiVersion); // Use a wrong port
 
     let errorReceived = false;
 
@@ -63,7 +63,7 @@ describe('IPC Protocol', function () {
 
   it('should not connect to a wrong api version', async function () {
     const info = JSON.parse(fs.readFileSync(infoPath, 'utf-8'));
-    const client = new IPCClient(info.port, 999); // Use an unsupported API version
+    const client = new IPCShowMenuClient(info.port, 999); // Use an unsupported API version
 
     let errorReceived = false;
 
@@ -81,7 +81,7 @@ describe('IPC Protocol', function () {
 
   it('should allow show-menu', async function () {
     const info = JSON.parse(fs.readFileSync(infoPath, 'utf-8'));
-    const client = new IPCClient(info.port, info.apiVersion);
+    const client = new IPCShowMenuClient(info.port, info.apiVersion);
     await client.init();
 
     // Listen for show-menu event on server.
@@ -93,13 +93,13 @@ describe('IPC Protocol', function () {
       // "interact" with the menu.
       callbacks.onSelection([0, 1]);
       callbacks.onHover([0, 1, 2]);
-      callbacks.onClose();
+      callbacks.onCancel();
     });
 
     // Listen for events on client
     let selectReceived = false;
     let hoverReceived = false;
-    let closeReceived = false;
+    let cancelReceived = false;
 
     client.on('select', (path) => {
       expect(path).to.deep.equal([0, 1]);
@@ -112,7 +112,7 @@ describe('IPC Protocol', function () {
     });
 
     client.on('cancel', () => {
-      closeReceived = true;
+      cancelReceived = true;
     });
 
     // Finally "show" the menu.
@@ -130,14 +130,14 @@ describe('IPC Protocol', function () {
     expect(menuReceived).to.be.true;
     expect(selectReceived).to.be.true;
     expect(hoverReceived).to.be.true;
-    expect(closeReceived).to.be.true;
+    expect(cancelReceived).to.be.true;
 
     client.close();
   });
 
   it('should reject a malformed message', async function () {
     const info = JSON.parse(fs.readFileSync(infoPath, 'utf-8'));
-    const client = new IPCClient(info.port, info.apiVersion);
+    const client = new IPCShowMenuClient(info.port, info.apiVersion);
     await client.init();
 
     // Listen for error events on client.

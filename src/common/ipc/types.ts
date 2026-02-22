@@ -21,6 +21,10 @@ export enum IPCErrorReason {
   eMalformedRequest = 'malformed-request',
   /** If the requested API version is not supported. */
   eVersionNotSupported = 'version-not-supported',
+  /** If a client wants to register as an observer but has already registered. */
+  eAlreadyObserving = 'already-observing',
+  /** If a client wants to unregister as an observer but is not registered. */
+  eNotObserving = 'not-observing',
 }
 
 /**
@@ -42,11 +46,30 @@ export const SHOW_MENU_MESSAGE = z.object({
 });
 
 /**
+ * Sent by the client to request that it wants to observe menu events. The server will
+ * start sending menu events to the client until it sends a stop-observing message or
+ * disconnects.
+ */
+export const START_OBSERVING_MESSAGE = z.object({
+  type: z.literal('start-observing'),
+});
+
+/** Sent by the client to request that it stops observing menu events. */
+export const STOP_OBSERVING_MESSAGE = z.object({
+  type: z.literal('stop-observing'),
+});
+
+/** Sent by the server to notify an observing client that a menu was opened. */
+export const OPEN_MENU_MESSAGE = z.object({
+  type: z.literal('open-menu'),
+});
+
+/**
  * Sent by the server to notify the client that the menu was closed without a selection.
  * This can happen if the user cancels the menu or another menu is shown on top.
  */
-export const CLOSE_MENU_MESSAGE = z.object({
-  type: z.literal('close-menu'),
+export const CANCEL_MENU_MESSAGE = z.object({
+  type: z.literal('cancel-menu'),
 });
 
 /**
@@ -79,14 +102,17 @@ export const ERROR_MESSAGE = z.object({
 
 export type IPCInfo = z.infer<typeof IPC_INFO_SCHEMA>;
 export type ShowMenuMessage = z.infer<typeof SHOW_MENU_MESSAGE>;
-export type CloseMenuMessage = z.infer<typeof CLOSE_MENU_MESSAGE>;
+export type StartObservingMessage = z.infer<typeof START_OBSERVING_MESSAGE>;
+export type StopObservingMessage = z.infer<typeof STOP_OBSERVING_MESSAGE>;
+export type OpenMenuMessage = z.infer<typeof OPEN_MENU_MESSAGE>;
+export type CancelMenuMessage = z.infer<typeof CANCEL_MENU_MESSAGE>;
 export type SelectItemMessage = z.infer<typeof SELECT_ITEM_MESSAGE>;
 export type HoverItemMessage = z.infer<typeof HOVER_ITEM_MESSAGE>;
 export type ErrorMessage = z.infer<typeof ERROR_MESSAGE>;
 
 export const IPC_MESSAGES = [
   SHOW_MENU_MESSAGE,
-  CLOSE_MENU_MESSAGE,
+  CANCEL_MENU_MESSAGE,
   SELECT_ITEM_MESSAGE,
   HOVER_ITEM_MESSAGE,
   ERROR_MESSAGE,
