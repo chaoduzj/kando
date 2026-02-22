@@ -200,6 +200,15 @@
             "isolated": "Selkem s wudem n uɛzal",
             "detached": "Selkem s wudem n war amsedday",
             "tip-1": "Tzemreḍ ad tesqedceḍ anaw n uferdis n tladna i usenker n yisnasen neɣ iskripten."
+        },
+        "uri": {
+            "tip-3": "Tzemreḍ ad tesqedceḍ aferdis URI akken ad teldiḍ aseɣwen: mailto.",
+            "tip-4": "Seqdec {{app_name}} akken ad tegreḍ isem n usnas i d-ildin mi teldiḍ umuɣ.",
+            "tip-5": "Seqdec {{window_name}} akken ad tegreḍ isem n usfaylu i d-ildin mi teldiḍ umuɣ.",
+            "tip-6": "Seqdec {{pointer_x}} akked {{pointer_y}} ad tegreḍ ideg n usewwaṛ mi teldiḍ umuɣ."
+        },
+        "common": {
+            "inhibit-shortcuts": "Sens inegzumen"
         }
     },
     "achievements": {
@@ -241,7 +250,8 @@
         },
         "completed-title": "Iswi yettwarẓem!",
         "gesture-selector": {
-            "description": "Fren {{n}} n yiferdisen s uskar turbu neɣ n ucraḍ."
+            "description": "Fren {{n}} n yiferdisen s uskar turbu neɣ n ucraḍ.",
+            "name": "{{attribute}} Tazmert n Ninja"
         },
         "settings-opened": {
             "name": "D asikel i d araz {{tier}}",
@@ -253,6 +263,46 @@
         "restore": {
             "name": "Tagnit tis snat {{tier}}",
             "description": "Err-d aḥras {{n}} n tikkal."
+        },
+        "attributes": {
+            "novice": "Abujad",
+            "capable": "Yezmer",
+            "skilled": "Iẓweṛ",
+            "expert": "Amazzay",
+            "master": "D asdegdeg"
+        },
+        "tier": {
+            "I": "I",
+            "II": "II",
+            "III": "III",
+            "IV": "IV",
+            "V": "V"
+        },
+        "cancelor": {
+            "name": "Abrid n Yilem {{tier}}",
+            "description": "Sefsex tafrayt {{n}} n tikkal."
+        },
+        "selector": {
+            "name": "{{attribute}} Samuray",
+            "description": "Fren {{n}} n yiferdisen."
+        },
+        "depth-selector": {
+            "name1": "{{attribute}} Amegzam",
+            "name2": "{{attribute}} Amegzam n sin Tissi",
+            "name3": "{{attribute}} Amegzam lqayen",
+            "description": "Fren {{n}} n yiferdisen ɣer telqayt {{depth}} deg ma drus {{time}} n mili-tasint."
+        },
+        "click-selector": {
+            "name": "{{attribute}} Alɣuɣ n usiti",
+            "description": "Fren {{n}} n yiferdisen s usiti n tɣerdayt."
+        },
+        "keyboard-selector": {
+            "name": "{{attribute}} Asaḍ n inegzumen",
+            "description": "Fren {{n}} n yiferdisen s unasiw-ik·im."
+        },
+        "gamepad-selector": {
+            "name": "{{attribute}} Amgara n ufus usenqed n wuraren",
+            "description": "Fren {{n}} n yiferdisen s useqdec n ufus usenqed n wuraren."
         }
     },
     "main": {
