@@ -19,6 +19,7 @@ export function createCrossWebSocket(url: string): {
   onmessage?: (event: { data: string }) => void;
   onerror?: (event: unknown) => void;
 } {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const WebSocketImpl =
     typeof window !== 'undefined' && typeof window.WebSocket !== 'undefined'
       ? window.WebSocket

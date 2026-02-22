@@ -11,7 +11,7 @@
 import { EventEmitter } from 'events';
 
 import * as IPCTypes from './types';
-import { TypedEventEmitter, MenuItem } from '..';
+import { TypedEventEmitter } from '..';
 import { createCrossWebSocket } from './cross-websocket';
 
 /** These events are emitted by the IPC client when menu interactions occur. */
