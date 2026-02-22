@@ -46,7 +46,6 @@ import { SoundTheme } from './sound-theme';
  *
  * @fires 'select' When a leaf item is selected.
  * @fires 'hover' When an item is hovered.
- * @fires 'unhover' When an item is unhovered.
  * @fires 'cancel' When the menu is hidden.
  * @fires 'move-pointer' When the mouse pointer should be warped due to menu clamping at
  *   the screen edges.
@@ -772,7 +771,6 @@ export class Menu extends EventEmitter {
     }
 
     if (this.hoveredItem) {
-      this.emit('unhover', this.hoveredItem.path);
       this.hoveredItem.nodeDiv.classList.remove('hovered');
       this.hoveredItem = null;
     }

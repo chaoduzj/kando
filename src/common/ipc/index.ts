@@ -8,5 +8,5 @@
 // SPDX-FileCopyrightText: Simon Schneegans <code@simonschneegans.de>
 // SPDX-License-Identifier: MIT
 
-export { IPCServer } from './ipc-server';
+export { IPCServer, IPCCallbacks } from './ipc-server';
 export { IPCShowMenuClient } from './ipc-show-menu-client';

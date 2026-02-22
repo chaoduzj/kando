@@ -14,7 +14,6 @@ import os from 'os';
 import path from 'path';
 
 import * as IPCTypes from '../src/common/ipc/types';
-import { MenuItem } from '../src/common';
 import { IPCServer } from '../src/common/ipc/ipc-server';
 import { IPCObserverClient } from '../src/common/ipc/ipc-observer-client';
 
@@ -84,7 +83,7 @@ describe('IPC Observer Protocol', function () {
 
       // "interact" with the menu.
       callbacks.onOpen();
-      callbacks.onSelection([0, 1]);
+      callbacks.onSelect([0, 1]);
       callbacks.onHover([0, 1, 2]);
       callbacks.onCancel();
     });

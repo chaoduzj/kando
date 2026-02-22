@@ -168,9 +168,6 @@ Promise.all([
     window.menuAPI.hoverItem(path);
   });
 
-  // Report unhover events to the main process.
-  menu.on('unhover', (path) => window.menuAPI.unhoverItem(path));
-
   document.body.addEventListener('keydown', async (ev) => {
     // Hide the menu when the user presses escape.
     if (ev.key === 'Escape') {

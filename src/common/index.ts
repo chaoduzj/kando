@@ -194,11 +194,6 @@ export type ShowMenuRequest = {
   readonly trigger?: string;
   readonly name?: string;
   readonly menu?: Menu;
-  readonly callbacks?: {
-    onSelection: (path: number[]) => void;
-    onHover: (path: number[]) => void;
-    onClose: () => void;
-  };
 };
 
 /**

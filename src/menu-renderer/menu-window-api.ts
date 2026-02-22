@@ -80,15 +80,6 @@ export const MENU_WINDOW_API = {
   },
 
   /**
-   * This will be called by the render process when the user unhovers a menu item.
-   *
-   * @param path The path of the unhovered menu item.
-   */
-  unhoverItem: (path: string) => {
-    ipcRenderer.send('menu-window.unhover-item', path);
-  },
-
-  /**
    * This will be called by the render process when the user cancels a selection in the
    * menu.
    */

@@ -44,7 +44,7 @@ import {
   tryLoadGeneralSettingsFile,
   tryLoadMenuSettingsFile,
 } from './settings';
-import { IPCServer } from '../common/ipc';
+import { IPCServer, IPCCallbacks } from '../common/ipc';
 import { MENU_SCHEMA_V1 } from '../common/settings-schemata/menu-settings-v1';
 import {
   EXPORTED_MENU_SCHEMA_V1,
@@ -90,6 +90,9 @@ export class KandoApp {
 
   /** This is used to manage the IPC interface for opening menus from other processes. */
   private ipcServer: IPCServer;
+
+  /** This is used to keep track of all active IPC observers. */
+  private ipcObservers: Map<number, IPCCallbacks> = new Map();
 
   /** This contains the last WMInfo which was received. */
   private lastWMInfo?: WMInfo;
@@ -202,7 +205,7 @@ export class KandoApp {
     await this.ipcServer.init();
 
     // When a menu is requested via IPC, we show it.
-    this.ipcServer.on('show-menu', (menuItem, callbacks) => {
+    this.ipcServer.on('show-menu', (menuItem) => {
       const menu: MenuType = {
         root: menuItem,
         shortcut: '',
@@ -212,7 +215,17 @@ export class KandoApp {
         hoverMode: false,
         tags: [],
       };
-      this.showMenu({ menu, callbacks });
+      this.showMenu({ menu });
+    });
+
+    // When a IPC client registers as observer, we store it.
+    this.ipcServer.on('start-observing', (observerID, callbacks) => {
+      this.ipcObservers.set(observerID, callbacks);
+    });
+
+    // When a IPC client stops observing, we remove it from the list.
+    this.ipcServer.on('stop-observing', (observerID) => {
+      this.ipcObservers.delete(observerID);
     });
 
     // Initialize the common IPC communication to the renderer process. This will be
@@ -221,8 +234,7 @@ export class KandoApp {
 
     // Create and load the main window if it does not exist yet.
     if (!this.generalSettings.get('lazyInitialization')) {
-      this.menuWindow = new MenuWindow(this);
-      await this.menuWindow.load();
+      await this.createMenuWindow();
     }
 
     // Bind the shortcuts for all menus.
@@ -388,8 +400,7 @@ export class KandoApp {
   public async showMenu(request: ShowMenuRequest) {
     // Create and load the main window if it does not exist yet.
     if (!this.menuWindow) {
-      this.menuWindow = new MenuWindow(this);
-      await this.menuWindow.load();
+      await this.createMenuWindow();
     }
 
     const [wmInfo, systemIconsChanged] = await Promise.all([
@@ -472,6 +483,37 @@ export class KandoApp {
 
     this.menuWindow?.webContents.send('menu-window.reload-icon-themes');
     this.settingsWindow?.webContents.send('settings-window.reload-icon-themes');
+  }
+
+  /**
+   * Creates the menu window and initializes its event handlers. Whenever an interaction
+   * with the menu happens, the respective callbacks of all registered IPC observers will
+   * be called. IPC observers can be registered by other processes via websockets.
+   */
+  private async createMenuWindow() {
+    this.menuWindow = new MenuWindow(this, {
+      onSelect: (path) => {
+        for (const observer of this.ipcObservers.values()) {
+          observer.onSelect(path);
+        }
+      },
+      onHover: (path) => {
+        for (const observer of this.ipcObservers.values()) {
+          observer.onHover(path);
+        }
+      },
+      onCancel: () => {
+        for (const observer of this.ipcObservers.values()) {
+          observer.onCancel();
+        }
+      },
+      onOpen: () => {
+        for (const observer of this.ipcObservers.values()) {
+          observer.onOpen();
+        }
+      },
+    });
+    await this.menuWindow.load();
   }
 
   /**

@@ -13,6 +13,7 @@ import { BrowserWindow, screen, ipcMain, app } from 'electron';
 
 import { DeepReadonly } from './settings';
 import { ShowMenuRequest, Menu, MenuItem, WMInfo, SelectionSource } from '../common';
+import { IPCCallbacks } from '../common/ipc';
 import { ItemActionRegistry } from './item-actions/item-action-registry';
 import { Notification } from './utils/notification';
 import { KandoApp } from './app';
@@ -66,7 +67,10 @@ export class MenuWindow extends BrowserWindow {
   /** This timeout is used to hide the window after the fade-out animation. */
   private hideTimeout: NodeJS.Timeout = null;
 
-  constructor(private kando: KandoApp) {
+  constructor(
+    private kando: KandoApp,
+    private ipcCallbacks: IPCCallbacks
+  ) {
     const display = screen.getPrimaryDisplay();
 
     super({
@@ -303,6 +307,8 @@ export class MenuWindow extends BrowserWindow {
         },
       }
     );
+
+    this.ipcCallbacks.onOpen();
   }
 
   /** This shows the window. */
@@ -702,7 +708,7 @@ export class MenuWindow extends BrowserWindow {
 
         // Call the provided callbacks if they exist.
         const pathArray = this.pathToArray(path);
-        this.lastRequest.callbacks?.onSelection(pathArray);
+        this.ipcCallbacks.onSelect(pathArray);
 
         // Track selection for achievements.
         this.kando.achievementTracker.onSelectionMade(
@@ -756,19 +762,14 @@ export class MenuWindow extends BrowserWindow {
 
     // When the user hovers a menu item, we report this to whoever requested the menu.
     ipcMain.on('menu-window.hover-item', (event, path) => {
-      this.lastRequest.callbacks?.onHover(this.pathToArray(path));
-    });
-
-    // When the user unhovers a menu item, we report this to the main process.
-    ipcMain.on('menu-window.unhover-item', (/*event, path*/) => {
-      // Nothing to do here yet.
+      this.ipcCallbacks.onHover(this.pathToArray(path));
     });
 
     // We do not hide the window immediately when the user aborts a selection. Instead, we
     // wait for the fade-out animation to finish.
     ipcMain.on('menu-window.cancel-selection', () => {
       this.hideWindow();
-      this.lastRequest.callbacks?.onClose();
+      this.ipcCallbacks.onCancel();
       this.kando.achievementTracker.incrementStat('cancels');
     });
 

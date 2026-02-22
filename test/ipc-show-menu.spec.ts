@@ -86,12 +86,16 @@ describe('IPC Show-Menu Protocol', function () {
 
     // Listen for show-menu event on server.
     let menuReceived = false;
-    server.on('show-menu', (menu, callbacks) => {
+    server.on('show-menu', (menu) => {
       menuReceived = true;
       expect(menu.name).to.equal('TestMenu');
+    });
 
-      // "interact" with the menu.
-      callbacks.onSelection([0, 1]);
+    // "interact" with the menu.
+    server.on('start-observing', (observerID, callbacks) => {
+      expect(observerID).to.equal(0); // One-time observer should have ID 0.
+
+      callbacks.onSelect([0, 1]);
       callbacks.onHover([0, 1, 2]);
       callbacks.onCancel();
     });
