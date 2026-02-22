@@ -317,7 +317,7 @@
             "search-placeholder": "Rechercher des Icônes…",
             "url-example": "Exemple d'URL :",
             "base64-hint": "Les icônes encodées en Base64 permettent d'inclure facilement n'importe quel type d'icône dans vos menus. Vous pouvez utiliser un service comme [www.base64-image.de] ({{link}}) pour convertir n'importe quelle image en une chaîne codée en Base64. Cela fonctionne même pour les gifs animés !",
-            "file-example": "file: exemple URI :",
+            "file-example": "file : exemple URI :",
             "hint": "Apprenez [ici]({{link}}) comment ajouter ou créer vos propres thèmes d'icônes.",
             "reload-button-tooltip": "Recharger tous les icônes"
         },
