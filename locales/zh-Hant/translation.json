@@ -138,7 +138,9 @@
             "wlroots-pointer-get-timeout-default-behavior-info": "決定若在設定時間內無法從 wlroots 後端取得位置時，指標應位於何處。",
             "previously-reported": "先前已回報",
             "enable-achievement-notifications-info": "啟用後，當成就解鎖時將會顯示通知。",
-            "enable-achievement-notifications": "顯示成就通知"
+            "enable-achievement-notifications": "顯示成就通知",
+            "windows-ink-workaround-info": "此選項會啟用一項相容性修正，解決在 Windows Ink 啟用時無法取得觸控筆位置的問題。將在開啟選單前增加 100 毫秒的延遲，因此若您不使用觸控筆，可停用此選項以加快選單開啟速度。",
+            "windows-ink-workaround": "Windows Ink 相容性修正"
         },
         "introduction-dialog": {
             "slide1-title": "Kando 提供了一種獨特且高效的方式，讓您與電腦互動。",
