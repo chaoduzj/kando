@@ -214,7 +214,7 @@
             "hint": "Aprenda [aquí]({{link}}) a añadir o crear sus propios temas de iconos."
         },
         "introduction-dialog": {
-            "title": "Le damos la bienvenida a Kando",
+            "title": "Le damos la bienvenida a Kando!",
             "slide12-title": "¡Hay más!",
             "chapter1": "Primeros pasos",
             "chapter3": "Modo turbo",
@@ -274,7 +274,7 @@
             "select-directory": "Seleccione un directorio"
         },
         "search-menus-placeholder": "Buscar en los menús…",
-        "add-collection-tooltip": "Cree una colección de menús nueva. Use las colecciones para agrupar sus menús por etiquetas.",
+        "add-collection-tooltip": "Cree una colección de menús nueva. Use las colecciones para agrupar sus menús por etiquetas!",
         "add-menu-items": "Añadir elementos al menú",
         "window-condition-placeholder": "Título de la ventana",
         "duplicate-menu": "Duplicar menú",
@@ -285,7 +285,7 @@
         "no-matching-menus": "No se encontró ningún menú.",
         "no-menus-note": "Si eliminó el último por accidente, puede restaurarlo con el botón Deshacer.",
         "empty-collection": "Esta colección está vacía.",
-        "no-matching-menus-note": "Pruebe con algún otro término de búsqueda.",
+        "no-matching-menus-note": "Pruebe con algún otro término de búsqueda?",
         "area-condition-tooltip": "Seleccione un área de la pantalla",
         "duplicate-menu-item": "Duplicar elemento del menú",
         "invalid-dropdown-selection": "Seleccionar una opción…",
