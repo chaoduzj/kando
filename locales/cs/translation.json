@@ -168,7 +168,9 @@
         },
         "common": {
             "delayed-option": "Počkat na dokončení animace",
-            "delayed-option-info": "Užitečné pokud akce cílí na okno, které musí být zaměřeno."
+            "delayed-option-info": "Užitečné pokud akce cílí na okno, které musí být zaměřeno.",
+            "inhibit-shortcuts-info": "Zakáže všechny Kando zkratky, zatímco je simulována klávesová zkratka nebo makro. To zabrání simulovanému vstupu omylem vyvolat jiné klávesové zkratky.",
+            "inhibit-shortcuts": "Zakázat zkratky"
         }
     },
     "settings": {
@@ -293,7 +295,21 @@
             "backup-menus": "Zálohovat menus.json…",
             "backup-settings": "Zálohovat config.json…",
             "restore-menus": "Obnovit menus.json…",
-            "restore-settings": "Obnovit config.json…"
+            "restore-settings": "Obnovit config.json…",
+            "enable-achievement-notifications-info": "Pokud povoleno, při odemknutí úspěchů se zobrazí upozornění.",
+            "enable-achievement-notifications": "Zobrazit oznámení o úspěchu",
+            "windows-ink-workaround-info": "Toto umožní obejít problém, kdy s Windows Ink není možné získat pozici stylusu. Přidá zpoždění 100m před otevřením nabídky, takže pokud nepoužíváte stylus, můžete toto zakázat, aby se menu otevíralo rychleji.",
+            "wlroots-specific-options": "Možnosti pro založené na wlroots",
+            "options-that-will-only-affect-the-wlroots-backend": "Tyto možnosti ovlivní pouze backend založený na wlroots a nemá žádný vliv na ostatní.",
+            "wlroots-pointer-get-timeout-mouse": "Limit Získat-pozici-kurzoru",
+            "wlroots-pointer-get-timeout-touch": "Limit Získat-pozici-dotyku",
+            "wlroots-pointer-get-timeout-default-behavior-info": "Určuje, kde by měl být ukazatel předpokládán, pokud z wlroots backendu žádná pozice nemohla být získána v nakonfigurovaném čase.",
+            "wlroots-pointer-get-timeout-default-behavior": "Záchytný bod kurzoru",
+            "center": "Centrum",
+            "previously-reported": "Dříve nahlášeno",
+            "windows-ink-workaround": "Obejít Windows-Ink",
+            "wlroots-pointer-get-timeout-mouse-info": "Maximální čas čekání na pozici myši na wlroots backendu v milisekundách. Pokud bude dosaženo limitu, bude použit záchytný bod. Výchozí je 500ms.",
+            "wlroots-pointer-get-timeout-touch-info": "Maximální čas čekání na pozici doteku na wlroots backendu v milisekundách. Pokud bude dosaženo limitu, bude použita záchytná pozice. Výchozí je 500ms."
         },
         "hover-mode": "Hover Mód",
         "hover-mode-info": "Pouze pro pokročilé uživatele! Položky vyberete najetím kurzoru.",
@@ -455,7 +471,12 @@
         "restore-menu-settings-warning-message": "Toto přepíše vaše aktuální menu a menu kolekce obsahem vybraného záložního souboru!",
         "restore-menu-settings-error-title": "Obnova menu ze zálohy se nezdařila!",
         "restore-menu-settings-success-title": "Úspěch!",
-        "restore-menu-settings-success-message": "Vaše menu a manu kolekce byly obnoveny ze záložního souboru."
+        "restore-menu-settings-success-message": "Vaše menu a manu kolekce byly obnoveny ze záložního souboru.",
+        "export-menu-error-title": "Export menu selhal",
+        "import-menu-error-title": "Import menu selhal",
+        "import-menu-error-message": "Zvolený soubor nelze importovat. Neobsahuje platné Kando menu.",
+        "export-menu": "Export menu",
+        "import-menu": "Import menu"
     },
     "achievements": {
         "attributes": {
