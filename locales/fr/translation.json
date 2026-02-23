@@ -308,7 +308,9 @@
             "wlroots-pointer-get-timeout-default-behavior-info": "Détermine la position supposée du curseur si aucune position n'a pu être obtenue à partir des backends basés sur wlroots dans le délai configuré.",
             "previously-reported": "Précédemment signalé",
             "enable-achievement-notifications-info": "Si cette option est activée, des notifications s'affichent lorsque des succès sont débloqués.",
-            "enable-achievement-notifications": "Afficher les notifications de succès"
+            "enable-achievement-notifications": "Afficher les notifications de succès",
+            "windows-ink-workaround-info": "Cela permet de contourner le problème qui empêche d'obtenir la position du stylet lorsque Windows Ink est activé. Cela introduit un délai de 100 ms avant l'ouverture du menu. Si vous n'utilisez pas de stylet, vous pouvez donc désactiver cette fonctionnalité pour que le menu s'ouvre plus rapidement.",
+            "windows-ink-workaround": "Contourner Windows-Ink"
         },
         "hover-mode": "Mode Survol",
         "hover-mode-info": "Pour utilisateurs expérimentés seulement ! Sélectionne les éléments en les survolant.",
