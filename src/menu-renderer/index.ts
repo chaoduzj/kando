@@ -157,15 +157,17 @@ Promise.all([
   });
 
   // Hide Kando's window when the user selects an item and notify the main process.
-  menu.on('select', (path, time, source) => {
-    menu.hide();
-    settingsButton.hide();
-    window.menuAPI.selectItem(path, time, source);
+  menu.on('select', (target, path, time, source) => {
+    if (target === 'item') {
+      menu.hide();
+      settingsButton.hide();
+    }
+    window.menuAPI.selectItem(target, path, time, source);
   });
 
   // Report hover events to the main process.
-  menu.on('hover', (path) => {
-    window.menuAPI.hoverItem(path);
+  menu.on('hover', (target, path) => {
+    window.menuAPI.hoverItem(target, path);
   });
 
   document.body.addEventListener('keydown', async (ev) => {

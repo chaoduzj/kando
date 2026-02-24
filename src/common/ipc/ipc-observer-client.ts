@@ -11,15 +11,15 @@
 import { EventEmitter } from 'events';
 
 import * as IPCTypes from './types';
-import { TypedEventEmitter } from '..';
+import { TypedEventEmitter, InteractionTarget } from '..';
 import { createCrossWebSocket } from './cross-websocket';
 
 /** These events are emitted by the IPC client when menu interactions occur. */
 type IPCObserverClientEvents = {
   open: [];
   cancel: [];
-  select: [path: number[]];
-  hover: [path: number[]];
+  select: [target: InteractionTarget, path: number[]];
+  hover: [target: InteractionTarget, path: number[]];
   error: [error: IPCTypes.IPCErrorReason];
 };
 
@@ -98,9 +98,11 @@ export class IPCObserverClient extends (EventEmitter as new () => TypedEventEmit
         } else if (IPCTypes.CANCEL_MENU_MESSAGE.safeParse(msg).success) {
           this.emit('cancel');
         } else if (IPCTypes.SELECT_ITEM_MESSAGE.safeParse(msg).success) {
-          this.emit('select', (msg as IPCTypes.SelectItemMessage).path);
+          const { target, path } = msg as IPCTypes.SelectItemMessage;
+          this.emit('select', target, path);
         } else if (IPCTypes.HOVER_ITEM_MESSAGE.safeParse(msg).success) {
-          this.emit('hover', (msg as IPCTypes.HoverItemMessage).path);
+          const { target, path } = msg as IPCTypes.HoverItemMessage;
+          this.emit('hover', target, path);
         } else if (IPCTypes.ERROR_MESSAGE.safeParse(msg).success) {
           const errorMsg = msg as IPCTypes.ErrorMessage;
           console.error(`IPC Error (${errorMsg.reason}): ${errorMsg.description}`);

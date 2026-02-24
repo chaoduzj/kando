@@ -15,7 +15,7 @@ import fs from 'fs';
 import path from 'path';
 import * as IPCTypes from './types';
 
-import { TypedEventEmitter, MenuItem } from '..';
+import { TypedEventEmitter, MenuItem, InteractionTarget } from '..';
 
 /**
  * Callbacks that are provided to the IPC server event handlers to report menu
@@ -25,9 +25,9 @@ import { TypedEventEmitter, MenuItem } from '..';
  */
 export type IPCCallbacks = {
   onOpen: () => void;
-  onSelect: (path: number[]) => void;
-  onHover: (path: number[]) => void;
   onCancel: () => void;
+  onSelect: (target: InteractionTarget, path: number[]) => void;
+  onHover: (target: InteractionTarget, path: number[]) => void;
 };
 
 /** These events are emitted by the IPC server when clients send requests. */
@@ -180,12 +180,20 @@ export class IPCServer extends (EventEmitter as new () => TypedEventEmitter<IPCS
           const openMsg: IPCTypes.OpenMenuMessage = { type: 'open-menu' };
           ws.send(JSON.stringify(openMsg));
         },
-        onHover: (path: number[]) => {
-          const hoverMsg: IPCTypes.HoverItemMessage = { type: 'hover-item', path };
+        onHover: (target: InteractionTarget, path: number[]) => {
+          const hoverMsg: IPCTypes.HoverItemMessage = {
+            type: 'hover-item',
+            target,
+            path,
+          };
           ws.send(JSON.stringify(hoverMsg));
         },
-        onSelect: (path: number[]) => {
-          const selectMsg: IPCTypes.SelectItemMessage = { type: 'select-item', path };
+        onSelect: (target: InteractionTarget, path: number[]) => {
+          const selectMsg: IPCTypes.SelectItemMessage = {
+            type: 'select-item',
+            target,
+            path,
+          };
           ws.send(JSON.stringify(selectMsg));
 
           if (oneTime) {

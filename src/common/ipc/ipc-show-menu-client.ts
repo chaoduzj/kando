@@ -11,14 +11,14 @@
 import { EventEmitter } from 'events';
 
 import * as IPCTypes from './types';
-import { TypedEventEmitter, MenuItem } from '..';
+import { TypedEventEmitter, MenuItem, InteractionTarget } from '..';
 import { createCrossWebSocket } from './cross-websocket';
 
 /** These events are emitted by the IPC client when menu interactions occur. */
 type IPCShowMenuClientEvents = {
   cancel: [];
-  select: [path: number[]];
-  hover: [path: number[]];
+  select: [target: InteractionTarget, path: number[]];
+  hover: [target: InteractionTarget, path: number[]];
   error: [error: IPCTypes.IPCErrorReason];
 };
 
@@ -34,9 +34,9 @@ type IPCShowMenuClientEvents = {
  *     const client = new IPCShowMenuClient(12345, 1);
  *     await client.init();
  *     client.showMenu(menuItem);
- *     client.on('select', (path) => { ... });
+ *     client.on('hover', (target, path) => { ... });
+ *     client.on('select', (target, path) => { ... });
  *     client.on('cancel', () => { ... });
- *     client.on('hover', (path) => { ... });
  */
 export class IPCShowMenuClient extends (EventEmitter as new () => TypedEventEmitter<IPCShowMenuClientEvents>) {
   private ws: ReturnType<typeof createCrossWebSocket> | null = null;
@@ -90,11 +90,13 @@ export class IPCShowMenuClient extends (EventEmitter as new () => TypedEventEmit
         const msg = JSON.parse(data);
 
         if (IPCTypes.SELECT_ITEM_MESSAGE.safeParse(msg).success) {
-          this.emit('select', (msg as IPCTypes.SelectItemMessage).path);
+          const { target, path } = msg as IPCTypes.SelectItemMessage;
+          this.emit('select', target, path);
         } else if (IPCTypes.CANCEL_MENU_MESSAGE.safeParse(msg).success) {
           this.emit('cancel');
         } else if (IPCTypes.HOVER_ITEM_MESSAGE.safeParse(msg).success) {
-          this.emit('hover', (msg as IPCTypes.HoverItemMessage).path);
+          const { target, path } = msg as IPCTypes.HoverItemMessage;
+          this.emit('hover', target, path);
         } else if (IPCTypes.ERROR_MESSAGE.safeParse(msg).success) {
           const errorMsg = msg as IPCTypes.ErrorMessage;
           console.error(`IPC Error (${errorMsg.reason}): ${errorMsg.description}`);

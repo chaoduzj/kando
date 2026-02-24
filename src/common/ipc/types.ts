@@ -10,6 +10,7 @@
 
 import * as z from 'zod';
 import { MENU_ITEM_SCHEMA } from '../settings-schemata';
+import { InteractionTarget } from '..';
 
 /** Enum of all possible reasons for declining a request. */
 export enum IPCErrorReason {
@@ -78,6 +79,7 @@ export const CANCEL_MENU_MESSAGE = z.object({
  */
 export const SELECT_ITEM_MESSAGE = z.object({
   type: z.literal('select-item'),
+  target: z.enum(InteractionTarget),
   path: z.array(z.number()),
 });
 
@@ -87,6 +89,7 @@ export const SELECT_ITEM_MESSAGE = z.object({
  */
 export const HOVER_ITEM_MESSAGE = z.object({
   type: z.literal('hover-item'),
+  target: z.enum(InteractionTarget),
   path: z.array(z.number()),
 });
 

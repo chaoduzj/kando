@@ -183,6 +183,13 @@ export type KeyStroke = {
  */
 export type KeySequence = Array<KeyStroke>;
 
+/** Enum for the different item categories which can be hovered or selected. */
+export enum InteractionTarget {
+  eItem = 'item',
+  eSubmenu = 'submenu',
+  eParent = 'parent',
+}
+
 /**
  * There are different reasons why a menu should be shown. This type is used to describe
  * the request to show a menu. A menu can be shown because a shortcut was pressed (in this

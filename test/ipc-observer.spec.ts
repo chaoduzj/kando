@@ -15,6 +15,7 @@ import path from 'path';
 
 import * as IPCTypes from '../src/common/ipc/types';
 import { IPCServer } from '../src/common/ipc/ipc-server';
+import { InteractionTarget } from '../src/common';
 import { IPCObserverClient } from '../src/common/ipc/ipc-observer-client';
 
 describe('IPC Observer Protocol', function () {
@@ -83,8 +84,8 @@ describe('IPC Observer Protocol', function () {
 
       // "interact" with the menu.
       callbacks.onOpen();
-      callbacks.onSelect([0, 1]);
-      callbacks.onHover([0, 1, 2]);
+      callbacks.onHover(InteractionTarget.eSubmenu, [0, 1, 2]);
+      callbacks.onSelect(InteractionTarget.eItem, [0, 1]);
       callbacks.onCancel();
     });
 
@@ -98,12 +99,14 @@ describe('IPC Observer Protocol', function () {
       openReceived = true;
     });
 
-    client.on('select', (path) => {
+    client.on('select', (target, path) => {
+      expect(target).to.equal(InteractionTarget.eItem);
       expect(path).to.deep.equal([0, 1]);
       selectReceived = true;
     });
 
-    client.on('hover', (path) => {
+    client.on('hover', (target, path) => {
+      expect(target).to.equal(InteractionTarget.eSubmenu);
       expect(path).to.deep.equal([0, 1, 2]);
       hoverReceived = true;
     });

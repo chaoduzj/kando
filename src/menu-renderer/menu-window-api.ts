@@ -11,7 +11,13 @@
 import { ipcRenderer, webFrame } from 'electron';
 
 import { COMMON_WINDOW_API } from '../common/common-window-api';
-import { Vec2, MenuItem, ShowMenuOptions, SelectionSource } from '../common';
+import {
+  Vec2,
+  MenuItem,
+  ShowMenuOptions,
+  SelectionSource,
+  InteractionTarget,
+} from '../common';
 
 /**
  * These functions are available in the menu window's renderer process. They are available
@@ -61,22 +67,29 @@ export const MENU_WINDOW_API = {
   /**
    * This will be called by the render process when the user selects a menu item.
    *
+   * @param target The type of the selected item (e.g. item, submenu, parent).
    * @param path The path of the selected menu item.
    * @param time The time it took to select the item in milliseconds. This is used for
    *   achievement tracking.
    * @param source The source used to make the selection.
    */
-  selectItem: (path: string, time: number, source: SelectionSource) => {
-    ipcRenderer.send('menu-window.select-item', path, time, source);
+  selectItem: (
+    target: InteractionTarget,
+    path: string,
+    time: number,
+    source: SelectionSource
+  ) => {
+    ipcRenderer.send('menu-window.select-item', target, path, time, source);
   },
 
   /**
    * This will be called by the render process when the user hovers a menu item.
    *
+   * @param target The type of the hovered item (e.g. item, submenu, parent).
    * @param path The path of the hovered menu item.
    */
-  hoverItem: (path: string) => {
-    ipcRenderer.send('menu-window.hover-item', path);
+  hoverItem: (target: InteractionTarget, path: string) => {
+    ipcRenderer.send('menu-window.hover-item', target, path);
   },
 
   /**

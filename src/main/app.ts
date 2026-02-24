@@ -492,14 +492,14 @@ export class KandoApp {
    */
   private async createMenuWindow() {
     this.menuWindow = new MenuWindow(this, {
-      onSelect: (path) => {
+      onSelect: (target, path) => {
         for (const observer of this.ipcObservers.values()) {
-          observer.onSelect(path);
+          observer.onSelect(target, path);
         }
       },
-      onHover: (path) => {
+      onHover: (target, path) => {
         for (const observer of this.ipcObservers.values()) {
-          observer.onHover(path);
+          observer.onHover(target, path);
         }
       },
       onCancel: () => {

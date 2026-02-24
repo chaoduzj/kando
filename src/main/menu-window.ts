@@ -12,7 +12,14 @@ import os from 'node:os';
 import { BrowserWindow, screen, ipcMain, app } from 'electron';
 
 import { DeepReadonly } from './settings';
-import { ShowMenuRequest, Menu, MenuItem, WMInfo, SelectionSource } from '../common';
+import {
+  ShowMenuRequest,
+  Menu,
+  MenuItem,
+  WMInfo,
+  SelectionSource,
+  InteractionTarget,
+} from '../common';
 import { IPCCallbacks } from '../common/ipc';
 import { ItemActionRegistry } from './item-actions/item-action-registry';
 import { Notification } from './utils/notification';
@@ -663,106 +670,115 @@ export class MenuWindow extends BrowserWindow {
     // execute the action.
     ipcMain.on(
       'menu-window.select-item',
-      (event, path: string, time: number, source: SelectionSource) => {
-        const execute = (item: DeepReadonly<MenuItem>) => {
-          ItemActionRegistry.getInstance()
-            .execute(item, this.kando)
-            .catch((error) => {
-              Notification.show({
-                title: 'Failed to execute action',
-                message: error instanceof Error ? error.message : error,
-                type: 'error',
+      (
+        event,
+        target: InteractionTarget,
+        path: string,
+        time: number,
+        source: SelectionSource
+      ) => {
+        const pathArray = this.pathToArray(path);
+
+        if (target === InteractionTarget.eItem) {
+          const execute = (item: DeepReadonly<MenuItem>) => {
+            ItemActionRegistry.getInstance()
+              .execute(item, this.kando)
+              .catch((error) => {
+                Notification.show({
+                  title: 'Failed to execute action',
+                  message: error instanceof Error ? error.message : error,
+                  type: 'error',
+                });
               });
+          };
+
+          let item: DeepReadonly<MenuItem>;
+          let executeDelayed = false;
+
+          try {
+            // Find the selected item.
+            item = this.getMenuItemAtPath(this.lastMenu.root, path);
+
+            // If the action is not delayed, we execute it immediately.
+            executeDelayed = ItemActionRegistry.getInstance().delayedExecution(item);
+            if (!executeDelayed) {
+              execute(item);
+            }
+          } catch (error) {
+            Notification.show({
+              title: 'Failed to select item',
+              message: error instanceof Error ? error.message : error,
+              type: 'error',
             });
-        };
-
-        let item: DeepReadonly<MenuItem>;
-        let executeDelayed = false;
-
-        try {
-          // Find the selected item.
-          item = this.getMenuItemAtPath(this.lastMenu.root, path);
-
-          // If the action is not delayed, we execute it immediately.
-          executeDelayed = ItemActionRegistry.getInstance().delayedExecution(item);
-          if (!executeDelayed) {
-            execute(item);
           }
-        } catch (error) {
-          Notification.show({
-            title: 'Failed to select item',
-            message: error instanceof Error ? error.message : error,
-            type: 'error',
+
+          // Also wait with the execution of the selected action until the fade-out
+          // animation is finished to make sure that any resulting events (such as virtual
+          // key presses) are not captured by the window.
+          this.hideWindow().then(() => {
+            // If the action is delayed, we execute it after the window is hidden.
+            if (executeDelayed) {
+              execute(item);
+            }
           });
-        }
 
-        // Also wait with the execution of the selected action until the fade-out
-        // animation is finished to make sure that any resulting events (such as virtual
-        // key presses) are not captured by the window.
-        this.hideWindow().then(() => {
-          // If the action is delayed, we execute it after the window is hidden.
-          if (executeDelayed) {
-            execute(item);
+          // Track selection for achievements.
+          this.kando.achievementTracker.onSelectionMade(
+            Math.min(Math.max(pathArray.length, 1), 3) as 1 | 2 | 3, // depth between 1 and 3
+            time,
+            source
+          );
+
+          this.lastSelections.push({ time, date: new Date() });
+          if (this.lastSelections.length > 10) {
+            this.lastSelections.shift();
           }
-        });
+
+          // Check for many-selections-streak achievement.
+          if (this.lastSelections.length === 10) {
+            const oldest = this.lastSelections[0];
+            const newest = this.lastSelections[9];
+            const timeDiff = newest.date.getTime() - oldest.date.getTime();
+
+            if (timeDiff <= 30000) {
+              this.kando.achievementTracker.incrementStat('manySelectionsStreaks1');
+            }
+
+            if (timeDiff <= 20000) {
+              this.kando.achievementTracker.incrementStat('manySelectionsStreaks2');
+            }
+
+            if (timeDiff <= 10000) {
+              this.kando.achievementTracker.incrementStat('manySelectionsStreaks3');
+            }
+          }
+
+          // Check for the speedy-selections-streak achievement.
+          if (this.lastSelections.length === 10) {
+            let average = 0.0;
+            this.lastSelections.forEach((selection) => {
+              average += selection.time / this.lastSelections.length;
+            });
+            if (average < 750) {
+              this.kando.achievementTracker.incrementStat('speedySelectionsStreaks1');
+            }
+            if (average < 500) {
+              this.kando.achievementTracker.incrementStat('speedySelectionsStreaks2');
+            }
+            if (average < 250) {
+              this.kando.achievementTracker.incrementStat('speedySelectionsStreaks3');
+            }
+          }
+        }
 
         // Call the provided callbacks if they exist.
-        const pathArray = this.pathToArray(path);
-        this.ipcCallbacks.onSelect(pathArray);
-
-        // Track selection for achievements.
-        this.kando.achievementTracker.onSelectionMade(
-          Math.min(Math.max(pathArray.length, 1), 3) as 1 | 2 | 3, // depth between 1 and 3
-          time,
-          source
-        );
-
-        this.lastSelections.push({ time, date: new Date() });
-        if (this.lastSelections.length > 10) {
-          this.lastSelections.shift();
-        }
-
-        // Check for many-selections-streak achievement.
-        if (this.lastSelections.length === 10) {
-          const oldest = this.lastSelections[0];
-          const newest = this.lastSelections[9];
-          const timeDiff = newest.date.getTime() - oldest.date.getTime();
-
-          if (timeDiff <= 30000) {
-            this.kando.achievementTracker.incrementStat('manySelectionsStreaks1');
-          }
-
-          if (timeDiff <= 20000) {
-            this.kando.achievementTracker.incrementStat('manySelectionsStreaks2');
-          }
-
-          if (timeDiff <= 10000) {
-            this.kando.achievementTracker.incrementStat('manySelectionsStreaks3');
-          }
-        }
-
-        // Check for the speedy-selections-streak achievement.
-        if (this.lastSelections.length === 10) {
-          let average = 0.0;
-          this.lastSelections.forEach((selection) => {
-            average += selection.time / this.lastSelections.length;
-          });
-          if (average < 750) {
-            this.kando.achievementTracker.incrementStat('speedySelectionsStreaks1');
-          }
-          if (average < 500) {
-            this.kando.achievementTracker.incrementStat('speedySelectionsStreaks2');
-          }
-          if (average < 250) {
-            this.kando.achievementTracker.incrementStat('speedySelectionsStreaks3');
-          }
-        }
+        this.ipcCallbacks.onSelect(target, pathArray);
       }
     );
 
     // When the user hovers a menu item, we report this to whoever requested the menu.
-    ipcMain.on('menu-window.hover-item', (event, path) => {
-      this.ipcCallbacks.onHover(this.pathToArray(path));
+    ipcMain.on('menu-window.hover-item', (event, target, path) => {
+      this.ipcCallbacks.onHover(target, this.pathToArray(path));
     });
 
     // We do not hide the window immediately when the user aborts a selection. Instead, we

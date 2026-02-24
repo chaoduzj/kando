@@ -14,7 +14,7 @@ import os from 'os';
 import path from 'path';
 
 import * as IPCTypes from '../src/common/ipc/types';
-import { MenuItem } from '../src/common';
+import { MenuItem, InteractionTarget } from '../src/common';
 import { IPCServer } from '../src/common/ipc/ipc-server';
 import { IPCShowMenuClient } from '../src/common/ipc/ipc-show-menu-client';
 
@@ -95,8 +95,8 @@ describe('IPC Show-Menu Protocol', function () {
     server.on('start-observing', (observerID, callbacks) => {
       expect(observerID).to.equal(0); // One-time observer should have ID 0.
 
-      callbacks.onSelect([0, 1]);
-      callbacks.onHover([0, 1, 2]);
+      callbacks.onHover(InteractionTarget.eSubmenu, [0, 1, 2]);
+      callbacks.onSelect(InteractionTarget.eItem, [0, 1]);
       callbacks.onCancel();
     });
 
@@ -105,12 +105,14 @@ describe('IPC Show-Menu Protocol', function () {
     let hoverReceived = false;
     let cancelReceived = false;
 
-    client.on('select', (path) => {
+    client.on('select', (target, path) => {
+      expect(target).to.equal(InteractionTarget.eItem);
       expect(path).to.deep.equal([0, 1]);
       selectReceived = true;
     });
 
-    client.on('hover', (path) => {
+    client.on('hover', (target, path) => {
+      expect(target).to.equal(InteractionTarget.eSubmenu);
       expect(path).to.deep.equal([0, 1, 2]);
       hoverReceived = true;
     });

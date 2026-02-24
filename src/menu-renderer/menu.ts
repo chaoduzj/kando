@@ -17,6 +17,7 @@ import {
   Vec2,
   SoundType,
   SelectionSource,
+  InteractionTarget,
 } from '../common';
 import { RenderedMenuItem } from './rendered-menu-item';
 import { SelectionWedges } from './selection-wedges';
@@ -44,7 +45,10 @@ import { SoundTheme } from './sound-theme';
  *
  * The menu is an event emitter and will emit the following events:
  *
- * @fires 'select' When a leaf item is selected.
+ * @fires 'select' When a node is selected. The event handler will receive the type of
+ *   item selected (e.g. item, submenu, parent), the path of the selected item, the time
+ *   it took to make the selection, and the input method which was used to make the
+ *   selection.
  * @fires 'hover' When an item is hovered.
  * @fires 'cancel' When the menu is hidden.
  * @fires 'move-pointer' When the mouse pointer should be warped due to menu clamping at
@@ -676,15 +680,20 @@ export class Menu extends EventEmitter {
       this.wedgeSeparators?.setSeparators(separators, clampedPosition);
     }
 
-    // Choose a sound effect to play. We do not play a sound effect for the initial
-    // selection of the root item.
+    // We do not play a sound effect for the initial selection of the root item and also
+    // do not emit any selection events.
+    let interactionTarget = null;
+
     if (item !== this.root || selectedParent) {
+      interactionTarget = InteractionTarget.eItem;
       let soundType = SoundType.eSelectItem;
       if (item.type === 'submenu') {
         soundType = SoundType.eSelectSubmenu;
+        interactionTarget = InteractionTarget.eSubmenu;
       }
       if (selectedParent) {
         soundType = SoundType.eSelectParent;
+        interactionTarget = InteractionTarget.eParent;
       }
       this.soundTheme.playSound(soundType);
     }
@@ -695,9 +704,18 @@ export class Menu extends EventEmitter {
     this.updateConnectors();
     this.redraw();
 
-    if (item.type !== 'submenu') {
+    if (interactionTarget === InteractionTarget.eItem) {
       this.container.classList.add('selected');
-      this.emit('select', item.path, Date.now() - this.menuShownTime, source);
+    }
+
+    if (interactionTarget !== null) {
+      this.emit(
+        'select',
+        interactionTarget,
+        item.path,
+        Date.now() - this.menuShownTime,
+        source
+      );
     }
   }
 
@@ -737,15 +755,19 @@ export class Menu extends EventEmitter {
     // Choose the sound effect to play. We only play a sound if a new item is hovered and
     // if there was a previously hovered item. This ensures that no hover effect is played
     // when we enter a submenu - in this case the previously hovered item is null.
+    let interactionTarget = null;
     if (item && this.hoveredItem !== null) {
       let soundType = SoundType.eHoverItem;
+      interactionTarget = InteractionTarget.eItem;
 
       if (item.type === 'submenu') {
         soundType = SoundType.eHoverSubmenu;
+        interactionTarget = InteractionTarget.eSubmenu;
       }
 
       if (this.isParentOfCenterItem(item)) {
         soundType = SoundType.eHoverParent;
+        interactionTarget = InteractionTarget.eParent;
       }
 
       this.soundTheme.playSound(soundType);
@@ -778,7 +800,10 @@ export class Menu extends EventEmitter {
     if (item) {
       this.hoveredItem = item;
       this.hoveredItem.nodeDiv.classList.add('hovered');
-      this.emit('hover', this.hoveredItem.path);
+
+      if (interactionTarget !== null) {
+        this.emit('hover', interactionTarget, this.hoveredItem.path);
+      }
     }
   }
 
