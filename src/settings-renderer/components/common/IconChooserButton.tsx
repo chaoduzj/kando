@@ -53,6 +53,13 @@ type Props = {
 };
 
 /**
+ * This stores the last icon theme selected by the user in the icon picker. It is used to
+ * reopen the icon picker with the same theme when the user opens it again.
+ */
+let lastSelectedTheme: string | null = null;
+let lastIconName: string | null = null;
+
+/**
  * A customizable color button component.
  *
  * @param props - The properties for the color button component.
@@ -62,11 +69,17 @@ export default function IconChooserButton(props: Props) {
   const [reloadCount, setReloadCount] = React.useState(0);
   const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
   const [filterTerm, setFilterTerm] = React.useState('');
-  const [theme, setTheme] = React.useState(props.theme);
+  const [theme, setTheme] = React.useState(
+    lastIconName === props.icon && lastSelectedTheme ? lastSelectedTheme : props.theme
+  );
 
   React.useEffect(() => {
-    setTheme(props.theme);
-  }, [props.theme]);
+    if (lastIconName === props.icon && lastSelectedTheme) {
+      setTheme(lastSelectedTheme);
+    } else {
+      setTheme(props.theme);
+    }
+  }, [props.theme, props.icon]);
 
   // Reload the icon pickers when the icon themes are reloaded.
   React.useEffect(() => {
@@ -122,7 +135,11 @@ export default function IconChooserButton(props: Props) {
                   value: key,
                   label: name.name,
                 }))}
-                onChange={setTheme}
+                onChange={(newTheme) => {
+                  lastSelectedTheme = newTheme;
+                  lastIconName = props.icon;
+                  setTheme(newTheme);
+                }}
               />
               <Button
                 isGrouped
