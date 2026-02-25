@@ -33,6 +33,7 @@ This changelog follows the rules of [Keep a Changelog](http://keepachangelog.com
 
 ### :wrench: Changed
 
+- The icon-picker dialog will now remember the last selected icon theme if you closed it by accident. Before, it would always reset to the currently selected icon theme which could be quite annoying. Thanks to [@Haruto-works333](https://github.com/Haruto-works333) for this contribution!
 - Upgraded many dependencies to their latest versions. This includes an upgrade to Electron 40 which uses Wayland natively now on Linux. Feel free to report any issues you encounter!
 - Pinned all GitHub Actions to specific commit SHAs to increase the security of the build process. Thanks to [@pgoslatara](https://github.com/pgoslatara) for this contribution!
 
