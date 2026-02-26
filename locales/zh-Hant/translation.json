@@ -195,7 +195,18 @@
             "create-your-own-themes": "建立自己的主題",
             "author": "由 {{author}} 製作",
             "selection-wedges-info": "若啟用且所選主題支援時，選單項目的可選取區域將會以高亮顯示。",
-            "selection-wedges": "繪製項目選取區域"
+            "selection-wedges": "繪製項目選取區域",
+            "save-preset-error-title": "儲存預設集失敗",
+            "save-preset-error-message": "無法儲存色彩預設集。請確認該目錄是否具備寫入權限。錯誤：{{error}}",
+            "default-colors": "預設色彩",
+            "choose-preset": "選擇預設集…",
+            "reload-presets": "重新載入預設集",
+            "save-preset": "儲存預設集",
+            "open-presets-directory": "開啟預設集目錄",
+            "preset-name-empty": "預設集名稱不可為空！",
+            "preset-name-invalid": "預設集名稱只能包含英文字母、數字、連字號、底線與空格！",
+            "preset-name-exists": "已存在相同名稱的預設集。",
+            "preset-name-placeholder": "例如：My Custom Colors"
         },
         "all-menus": "所有選單",
         "search-menus-placeholder": "搜尋選單…",
@@ -287,7 +298,7 @@
         "achievements-dialog": {
             "reset-button": "重設進度",
             "reset-confirmation-title": "確定要重設所有進度嗎？",
-            "reset-confirmation-message": "所有成就與等級進度將會遺失。此動作無法復原。",
+            "reset-confirmation-message": "將會失去所有成就與等級進度。此動作無法復原。",
             "title": "成就",
             "xp": "XP",
             "in-progress-button": "進行中",
