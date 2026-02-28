@@ -9,8 +9,9 @@
 // SPDX-License-Identifier: MIT
 
 export * from './settings-schemata';
+export * from './typed-event-emitter';
 
-import { AchievementStats } from './settings-schemata';
+import { AchievementStats, Menu } from './settings-schemata';
 
 /** This type is used to pass command line arguments to the app. */
 export type CommandlineOptions = {
@@ -123,6 +124,12 @@ export type WMInfo = {
 export type SystemInfo = {
   /** Whether the system supports launching isolated processes. */
   readonly supportsIsolatedProcesses: boolean;
+
+  /** The IPC port used by Kando's own IPC show-menu interface. */
+  readonly ipcPort: number;
+
+  /** The API version supported by Kando's own IPC show-menu interface. */
+  readonly ipcApiVersion: number;
 };
 
 /** This type describes a icon theme consisting of a collection of icon files. */
@@ -176,15 +183,24 @@ export type KeyStroke = {
  */
 export type KeySequence = Array<KeyStroke>;
 
+/** Enum for the different item categories which can be hovered or selected. */
+export enum InteractionTarget {
+  eItem = 'item',
+  eSubmenu = 'submenu',
+  eParent = 'parent',
+}
+
 /**
  * There are different reasons why a menu should be shown. This type is used to describe
  * the request to show a menu. A menu can be shown because a shortcut was pressed (in this
- * case `trigger` will be the shortcut or the shortcut ID) or because a menu was requested
- * by name.
+ * case `trigger` will be the shortcut or the shortcut ID), because a menu was requested
+ * by name, or a custom menu is requested (in this case `menu` contains the menu
+ * structure).
  */
 export type ShowMenuRequest = {
-  readonly trigger: string;
-  readonly name: string;
+  readonly trigger?: string;
+  readonly name?: string;
+  readonly menu?: Menu;
 };
 
 /**

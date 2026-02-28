@@ -19,6 +19,7 @@ export type {
   MenuSettingsV1 as MenuSettings,
 } from './menu-settings-v1';
 export { MENU_SETTINGS_SCHEMA_V1 as MENU_SETTINGS_SCHEMA } from './menu-settings-v1';
+export { MENU_ITEM_SCHEMA_V1 as MENU_ITEM_SCHEMA } from './menu-settings-v1';
 
 export type { ExportedMenuV1 as ExportedMenu } from './exported-menu-v1';
 export { EXPORTED_MENU_SCHEMA_V1 as EXPORTED_MENU_SCHEMA } from './exported-menu-v1';

@@ -8,37 +8,16 @@
 // SPDX-FileCopyrightText: Simon Schneegans <code@simonschneegans.de>
 // SPDX-License-Identifier: MIT
 
-import i18next from 'i18next';
+import { ItemAction } from './item-action-registry';
 
-import { ItemType } from './item-type-registry';
-
-/** This class provides meta information for submenu items. */
-export class SubmenuItemType implements ItemType {
-  get hasChildren(): boolean {
-    return true;
+/**
+ * This dummy action does nothing. It is used for item types which are only instantiated
+ * via the IPC interface, but have no predefined action.
+ */
+export class NoItemAction implements ItemAction {
+  delayedExecution() {
+    return false;
   }
 
-  get isUserSelectable(): boolean {
-    return true;
-  }
-
-  get defaultName(): string {
-    return i18next.t('menu-items.submenu.name');
-  }
-
-  get defaultIcon(): string {
-    return 'submenu-item.svg';
-  }
-
-  get defaultIconTheme(): string {
-    return 'kando';
-  }
-
-  get defaultData() {
-    return {};
-  }
-
-  get genericDescription(): string {
-    return i18next.t('menu-items.submenu.description');
-  }
+  async execute() {}
 }

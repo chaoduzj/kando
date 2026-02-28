@@ -12,7 +12,15 @@ import os from 'node:os';
 import { BrowserWindow, screen, ipcMain, app } from 'electron';
 
 import { DeepReadonly } from './settings';
-import { ShowMenuRequest, Menu, MenuItem, WMInfo, SelectionSource } from '../common';
+import {
+  ShowMenuRequest,
+  Menu,
+  MenuItem,
+  WMInfo,
+  SelectionSource,
+  InteractionTarget,
+} from '../common';
+import { IPCCallbacks } from '../common/ipc';
 import { ItemActionRegistry } from './item-actions/item-action-registry';
 import { Notification } from './utils/notification';
 import { KandoApp } from './app';
@@ -30,6 +38,9 @@ export class MenuWindow extends BrowserWindow {
    * action.
    */
   public lastMenu?: DeepReadonly<Menu>;
+
+  /** This contains the last request which was used to show the menu. */
+  public lastRequest?: ShowMenuRequest;
 
   /**
    * This contains the time points when the last ten selections were made. It is used to
@@ -63,7 +74,10 @@ export class MenuWindow extends BrowserWindow {
   /** This timeout is used to hide the window after the fade-out animation. */
   private hideTimeout: NodeJS.Timeout = null;
 
-  constructor(private kando: KandoApp) {
+  constructor(
+    private kando: KandoApp,
+    private ipcCallbacks: IPCCallbacks
+  ) {
     const display = screen.getPrimaryDisplay();
 
     super({
@@ -144,7 +158,7 @@ export class MenuWindow extends BrowserWindow {
    *   time the menu was shown.
    */
   public async showMenu(
-    request: Partial<ShowMenuRequest>,
+    request: ShowMenuRequest,
     info: WMInfo,
     systemIconsChanged: boolean
   ) {
@@ -153,9 +167,7 @@ export class MenuWindow extends BrowserWindow {
       .get('sameShortcutBehavior');
 
     // If a menu is currently shown and the user presses the same shortcut again we will
-    // either close the menu or show the next one with the same shortcut. There is also
-    // the option to do nothing in this case, but in this case the menu's shortcut will be
-    // inhibited and thus this method will not be called in the first place.
+    // either close the menu or show the next one with the same shortcut.
     if (this.isVisible()) {
       let isSameMenu = false;
       if (request.name != null) {
@@ -214,12 +226,17 @@ export class MenuWindow extends BrowserWindow {
       const shortcut = useID ? menu.shortcutID : menu.shortcut;
 
       // Push the current shortcuts to the stack and inhibit the menu's shortcut
-      this.shortcutInhibitionID = await this.kando.getBackend().inhibitShortcut(shortcut);
+      if (shortcut && shortcut.length > 0) {
+        this.shortcutInhibitionID = await this.kando
+          .getBackend()
+          .inhibitShortcut(shortcut);
+      }
     }
 
     // Store the last menu to be able to execute the selected action later. The WMInfo
     // will be passed to the action as well.
     this.lastMenu = menu;
+    this.lastRequest = request;
 
     // On Windows, we have to show the window before we can move it. Otherwise, the
     // window will not be moved to the correct monitor.
@@ -297,6 +314,8 @@ export class MenuWindow extends BrowserWindow {
         },
       }
     );
+
+    this.ipcCallbacks.onOpen();
   }
 
   /** This shows the window. */
@@ -411,21 +430,27 @@ export class MenuWindow extends BrowserWindow {
   /**
    * This chooses the correct menu depending on the environment.
    *
-   * If the request contains a menu name, this menu is chosen. If no menu with the given
-   * name is found, an exception is thrown. If there are multiple menus with the same
-   * name, the first one is chosen. No other conditions are checked in this case.
+   * If the request contains a custom menu, this menu is returned. No other conditions are
+   * checked in this case.
    *
-   * If the request contains a trigger (shortcut or shortcutID), a list of menus bound to
-   * this trigger is assembled and the menu with the best matching conditions is chosen.
-   * If no menu with the given trigger is found, null is returned.
+   * If the request contains a trigger (shortcut or shortcutID) or menu name, we first
+   * check whether there are any menus with the given trigger or name. If none are found,
+   * an exception is thrown.
    *
-   * If neither a menu name nor a trigger is given, null is returned.
+   * Then, a list of menu candidates is assembled and the menu with the best matching
+   * conditions is chosen. If no menu with the given trigger or name is found, null is
+   * returned.
    *
    * @param request Required information to select correct menu.
    * @param info Information about current desktop environment.
    * @returns The selected menu or null if no menu was found.
    */
-  public chooseMenu(request: Partial<ShowMenuRequest>, info: WMInfo) {
+  public chooseMenu(request: ShowMenuRequest, info: WMInfo) {
+    // If a custom menu is given in the request, we return this menu directly.
+    if (request.menu) {
+      return request.menu;
+    }
+
     // Get list of current menus.
     const menus = this.kando.getMenuSettings().get('menus');
 
@@ -434,7 +459,19 @@ export class MenuWindow extends BrowserWindow {
     if (request.name != null) {
       const menu = menus.find((m) => m.root.name === request.name);
       if (!menu) {
-        throw new Error(`Menu with name "${request.name}" not found.`);
+        throw new Error(`No menu with name "${request.name}" found.`);
+      }
+    }
+
+    // We check if the request has a trigger. If no menu with this trigger is found, we
+    // throw an error.
+    if (request.trigger != null) {
+      const useID = !this.kando.getBackend().getBackendInfo().supportsShortcuts;
+      const menu = menus.find(
+        (m) => (useID ? m.shortcutID : m.shortcut) === request.trigger
+      );
+      if (!menu) {
+        throw new Error(`No menu with trigger "${request.trigger}" found.`);
       }
     }
 
@@ -563,6 +600,19 @@ export class MenuWindow extends BrowserWindow {
   }
 
   /**
+   * This converts a path string to an array of numbers.
+   *
+   * @param path The path string to convert.
+   * @returns The array of numbers.
+   */
+  private pathToArray(path: string): number[] {
+    return path
+      .substring(1)
+      .split('/')
+      .map((x: string) => parseInt(x));
+  }
+
+  /**
    * This returns the menu item at the given path from the given root menu. The path is a
    * string of numbers separated by slashes. Each number is the index of the child menu
    * item to select. For example, the path "0/2/1" would select the second child of the
@@ -575,10 +625,7 @@ export class MenuWindow extends BrowserWindow {
    */
   private getMenuItemAtPath(root: DeepReadonly<MenuItem>, path: string) {
     let item = root;
-    const indices = path
-      .substring(1)
-      .split('/')
-      .map((x: string) => parseInt(x));
+    const indices = this.pathToArray(path);
 
     for (const index of indices) {
       if (!item.children || index >= item.children.length) {
@@ -623,113 +670,122 @@ export class MenuWindow extends BrowserWindow {
     // execute the action.
     ipcMain.on(
       'menu-window.select-item',
-      (event, path: string, time: number, source: SelectionSource) => {
-        const execute = (item: DeepReadonly<MenuItem>) => {
-          ItemActionRegistry.getInstance()
-            .execute(item, this.kando)
-            .catch((error) => {
-              Notification.show({
-                title: 'Failed to execute action',
-                message: error instanceof Error ? error.message : error,
-                type: 'error',
+      (
+        event,
+        target: InteractionTarget,
+        path: string,
+        time: number,
+        source: SelectionSource
+      ) => {
+        const pathArray = this.pathToArray(path);
+
+        if (target === InteractionTarget.eItem) {
+          const execute = (item: DeepReadonly<MenuItem>) => {
+            ItemActionRegistry.getInstance()
+              .execute(item, this.kando)
+              .catch((error) => {
+                Notification.show({
+                  title: 'Failed to execute action',
+                  message: error instanceof Error ? error.message : error,
+                  type: 'error',
+                });
               });
+          };
+
+          let item: DeepReadonly<MenuItem>;
+          let executeDelayed = false;
+
+          try {
+            // Find the selected item.
+            item = this.getMenuItemAtPath(this.lastMenu.root, path);
+
+            // If the action is not delayed, we execute it immediately.
+            executeDelayed = ItemActionRegistry.getInstance().delayedExecution(item);
+            if (!executeDelayed) {
+              execute(item);
+            }
+          } catch (error) {
+            Notification.show({
+              title: 'Failed to select item',
+              message: error instanceof Error ? error.message : error,
+              type: 'error',
             });
-        };
-
-        let item: DeepReadonly<MenuItem>;
-        let executeDelayed = false;
-
-        try {
-          // Find the selected item.
-          item = this.getMenuItemAtPath(this.lastMenu.root, path);
-
-          // If the action is not delayed, we execute it immediately.
-          executeDelayed = ItemActionRegistry.getInstance().delayedExecution(item);
-          if (!executeDelayed) {
-            execute(item);
           }
-        } catch (error) {
-          Notification.show({
-            title: 'Failed to select item',
-            message: error instanceof Error ? error.message : error,
-            type: 'error',
+
+          // Also wait with the execution of the selected action until the fade-out
+          // animation is finished to make sure that any resulting events (such as virtual
+          // key presses) are not captured by the window.
+          this.hideWindow().then(() => {
+            // If the action is delayed, we execute it after the window is hidden.
+            if (executeDelayed) {
+              execute(item);
+            }
           });
-        }
 
-        // Also wait with the execution of the selected action until the fade-out
-        // animation is finished to make sure that any resulting events (such as virtual
-        // key presses) are not captured by the window.
-        this.hideWindow().then(() => {
-          // If the action is delayed, we execute it after the window is hidden.
-          if (executeDelayed) {
-            execute(item);
-          }
-        });
+          // Track selection for achievements.
+          this.kando.achievementTracker.onSelectionMade(
+            Math.min(Math.max(pathArray.length, 1), 3) as 1 | 2 | 3, // depth between 1 and 3
+            time,
+            source
+          );
 
-        // Track selection for achievements.
-        this.kando.achievementTracker.onSelectionMade(
-          Math.min(Math.max(path.split('/').length - 1, 1), 3) as 1 | 2 | 3, // depth between 1 and 3
-          time,
-          source
-        );
-
-        this.lastSelections.push({ time, date: new Date() });
-        if (this.lastSelections.length > 10) {
-          this.lastSelections.shift();
-        }
-
-        // Check for many-selections-streak achievement.
-        if (this.lastSelections.length === 10) {
-          const oldest = this.lastSelections[0];
-          const newest = this.lastSelections[9];
-          const timeDiff = newest.date.getTime() - oldest.date.getTime();
-
-          if (timeDiff <= 30000) {
-            this.kando.achievementTracker.incrementStat('manySelectionsStreaks1');
+          this.lastSelections.push({ time, date: new Date() });
+          if (this.lastSelections.length > 10) {
+            this.lastSelections.shift();
           }
 
-          if (timeDiff <= 20000) {
-            this.kando.achievementTracker.incrementStat('manySelectionsStreaks2');
+          // Check for many-selections-streak achievement.
+          if (this.lastSelections.length === 10) {
+            const oldest = this.lastSelections[0];
+            const newest = this.lastSelections[9];
+            const timeDiff = newest.date.getTime() - oldest.date.getTime();
+
+            if (timeDiff <= 30000) {
+              this.kando.achievementTracker.incrementStat('manySelectionsStreaks1');
+            }
+
+            if (timeDiff <= 20000) {
+              this.kando.achievementTracker.incrementStat('manySelectionsStreaks2');
+            }
+
+            if (timeDiff <= 10000) {
+              this.kando.achievementTracker.incrementStat('manySelectionsStreaks3');
+            }
           }
 
-          if (timeDiff <= 10000) {
-            this.kando.achievementTracker.incrementStat('manySelectionsStreaks3');
-          }
-        }
-
-        // Check for the speedy-selections-streak achievement.
-        if (this.lastSelections.length === 10) {
-          let average = 0.0;
-          this.lastSelections.forEach((selection) => {
-            average += selection.time / this.lastSelections.length;
-          });
-          if (average < 750) {
-            this.kando.achievementTracker.incrementStat('speedySelectionsStreaks1');
-          }
-          if (average < 500) {
-            this.kando.achievementTracker.incrementStat('speedySelectionsStreaks2');
-          }
-          if (average < 250) {
-            this.kando.achievementTracker.incrementStat('speedySelectionsStreaks3');
+          // Check for the speedy-selections-streak achievement.
+          if (this.lastSelections.length === 10) {
+            let average = 0.0;
+            this.lastSelections.forEach((selection) => {
+              average += selection.time / this.lastSelections.length;
+            });
+            if (average < 750) {
+              this.kando.achievementTracker.incrementStat('speedySelectionsStreaks1');
+            }
+            if (average < 500) {
+              this.kando.achievementTracker.incrementStat('speedySelectionsStreaks2');
+            }
+            if (average < 250) {
+              this.kando.achievementTracker.incrementStat('speedySelectionsStreaks3');
+            }
           }
         }
+
+        // Call the provided callbacks if they exist.
+        this.ipcCallbacks.onSelect(target, pathArray);
       }
     );
 
-    // When the user hovers a menu item, we report this to the main process.
-    ipcMain.on('menu-window.hover-item', (/*event, path*/) => {
-      // Nothing to do here yet.
-    });
-
-    // When the user unhovers a menu item, we report this to the main process.
-    ipcMain.on('menu-window.unhover-item', (/*event, path*/) => {
-      // Nothing to do here yet.
+    // When the user hovers a menu item, we report this to whoever requested the menu.
+    ipcMain.on('menu-window.hover-item', (event, target, path) => {
+      this.ipcCallbacks.onHover(target, this.pathToArray(path));
     });
 
     // We do not hide the window immediately when the user aborts a selection. Instead, we
     // wait for the fade-out animation to finish.
     ipcMain.on('menu-window.cancel-selection', () => {
       this.hideWindow();
+      this.ipcCallbacks.onCancel();
       this.kando.achievementTracker.incrementStat('cancels');
     });
 

@@ -21,6 +21,7 @@ import {
   AppDescription,
   LevelProgress,
 } from '../common';
+import { IPCMenuManager } from './utils/ipc-menu-manager';
 
 /**
  * These functions are available in the settings window's renderer process. They are
@@ -125,6 +126,11 @@ export const SETTINGS_WINDOW_API = {
     ipcRenderer.on('settings-window.show-achievements-dialog', () => {
       func();
     });
+  },
+
+  /** Open the menu with the given index in the list of all menus. */
+  openMenu: (index: number) => {
+    ipcRenderer.send('settings-window.open-menu', index);
   },
 
   /** This will show the web developer tools. */
@@ -256,4 +262,5 @@ export const SETTINGS_WINDOW_API = {
 export type WindowWithAPIs = {
   readonly commonAPI: typeof COMMON_WINDOW_API;
   readonly settingsAPI: typeof SETTINGS_WINDOW_API;
+  ipcAPI: IPCMenuManager;
 } & Window;

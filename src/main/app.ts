@@ -35,6 +35,8 @@ import {
   FileIconThemeDescription,
   SoundEffect,
   CommandlineOptions,
+  SystemInfo,
+  VersionInfo,
 } from '../common';
 import {
   Settings,
@@ -42,6 +44,7 @@ import {
   tryLoadGeneralSettingsFile,
   tryLoadMenuSettingsFile,
 } from './settings';
+import { IPCServer, IPCCallbacks } from '../common/ipc';
 import { MENU_SCHEMA_V1 } from '../common/settings-schemata/menu-settings-v1';
 import {
   EXPORTED_MENU_SCHEMA_V1,
@@ -59,12 +62,6 @@ import { supportsIsolatedProcesses } from './utils/shell';
  * interaction.
  */
 export class KandoApp {
-  /** This is used to track achievements. */
-  public achievementTracker: AchievementTracker;
-
-  /** This is used to check for updates. */
-  private updateChecker = new UpdateChecker();
-
   /**
    * The window is the main window of the application. It is a transparent window which
    * covers the whole screen. It is always on top and has no frame. It is used to display
@@ -84,6 +81,18 @@ export class KandoApp {
    * possible to disable this icon.
    */
   private tray: Tray;
+
+  /** This is used to track achievements. */
+  public achievementTracker: AchievementTracker;
+
+  /** This is used to check for updates. */
+  private updateChecker = new UpdateChecker();
+
+  /** This is used to manage the IPC interface for opening menus from other processes. */
+  private ipcServer: IPCServer;
+
+  /** This is used to keep track of all active IPC observers. */
+  private ipcObservers: Map<number, IPCCallbacks> = new Map();
 
   /** This contains the last WMInfo which was received. */
   private lastWMInfo?: WMInfo;
@@ -190,14 +199,42 @@ export class KandoApp {
       app.setActivationPolicy('accessory');
     }
 
+    // Create the IPC server for opening menus from other applications or our own settings
+    // renderer.
+    this.ipcServer = new IPCServer(app.getPath('userData'));
+    await this.ipcServer.init();
+
+    // When a menu is requested via IPC, we show it.
+    this.ipcServer.on('show-menu', (menuItem) => {
+      const menu: MenuType = {
+        root: menuItem,
+        shortcut: '',
+        shortcutID: '',
+        centered: false,
+        anchored: false,
+        hoverMode: false,
+        tags: [],
+      };
+      this.showMenu({ menu });
+    });
+
+    // When a IPC client registers as observer, we store it.
+    this.ipcServer.on('start-observing', (observerID, callbacks) => {
+      this.ipcObservers.set(observerID, callbacks);
+    });
+
+    // When a IPC client stops observing, we remove it from the list.
+    this.ipcServer.on('stop-observing', (observerID) => {
+      this.ipcObservers.delete(observerID);
+    });
+
     // Initialize the common IPC communication to the renderer process. This will be
     // available in both the menu window and the settings window.
     this.initCommonRendererAPI();
 
     // Create and load the main window if it does not exist yet.
     if (!this.generalSettings.get('lazyInitialization')) {
-      this.menuWindow = new MenuWindow(this);
-      await this.menuWindow.load();
+      await this.createMenuWindow();
     }
 
     // Bind the shortcuts for all menus.
@@ -263,6 +300,7 @@ export class KandoApp {
 
     this.generalSettings.close();
     this.menuSettings.close();
+    this.ipcServer.close();
   }
 
   /**
@@ -359,11 +397,10 @@ export class KandoApp {
    *
    * @param request Required information to select correct menu.
    */
-  public async showMenu(request: Partial<ShowMenuRequest>) {
+  public async showMenu(request: ShowMenuRequest) {
     // Create and load the main window if it does not exist yet.
     if (!this.menuWindow) {
-      this.menuWindow = new MenuWindow(this);
-      await this.menuWindow.load();
+      await this.createMenuWindow();
     }
 
     const [wmInfo, systemIconsChanged] = await Promise.all([
@@ -449,6 +486,37 @@ export class KandoApp {
   }
 
   /**
+   * Creates the menu window and initializes its event handlers. Whenever an interaction
+   * with the menu happens, the respective callbacks of all registered IPC observers will
+   * be called. IPC observers can be registered by other processes via websockets.
+   */
+  private async createMenuWindow() {
+    this.menuWindow = new MenuWindow(this, {
+      onSelect: (target, path) => {
+        for (const observer of this.ipcObservers.values()) {
+          observer.onSelect(target, path);
+        }
+      },
+      onHover: (target, path) => {
+        for (const observer of this.ipcObservers.values()) {
+          observer.onHover(target, path);
+        }
+      },
+      onCancel: () => {
+        for (const observer of this.ipcObservers.values()) {
+          observer.onCancel();
+        }
+      },
+      onOpen: () => {
+        for (const observer of this.ipcObservers.values()) {
+          observer.onOpen();
+        }
+      },
+    });
+    await this.menuWindow.load();
+  }
+
+  /**
    * Setup IPC communication with the renderer process. See ../renderer/preload.ts for
    * more information on the exposed functionality.
    */
@@ -465,7 +533,7 @@ export class KandoApp {
         electronVersion: process.versions.electron,
         chromeVersion: process.versions.chrome,
         nodeVersion: process.versions.node,
-      };
+      } as VersionInfo;
     });
 
     // Allow the renderer to retrieve information about the current window manager state.
@@ -475,9 +543,13 @@ export class KandoApp {
 
     // Allow the renderer to retrieve information about the current system.
     ipcMain.handle('settings-window.get-system-info', () => {
+      const ipcPort = this.ipcServer.getPort();
+      const ipcApiVersion = this.ipcServer.getApiVersion();
       return {
         supportsIsolatedProcesses: supportsIsolatedProcesses(),
-      };
+        ipcPort,
+        ipcApiVersion,
+      } as SystemInfo;
     });
 
     // Allow the renderer to retrieve the position of the settings window.
@@ -689,6 +761,11 @@ export class KandoApp {
       }
 
       this.achievementTracker.resetProgress();
+    });
+
+    // Allow the renderer to open a specific menu. This is used for previewing menus.
+    ipcMain.on('settings-window.open-menu', (e, index: number) => {
+      this.showMenu({ menu: this.menuSettings.get('menus')[index] as MenuType });
     });
 
     // Show the web developer tools if requested.

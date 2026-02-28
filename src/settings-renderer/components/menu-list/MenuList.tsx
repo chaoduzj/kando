@@ -8,23 +8,23 @@
 // SPDX-FileCopyrightText: Simon Schneegans <code@simonschneegans.de>
 // SPDX-License-Identifier: MIT
 
+import { WindowWithAPIs } from '../../settings-window-api';
+declare const window: WindowWithAPIs;
+
 import React from 'react';
 import i18next from 'i18next';
 import classNames from 'classnames/bind';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import { TbPlus, TbCopy, TbTrash, TbDownload, TbUpload } from 'react-icons/tb';
+import { TbPlus, TbDownload } from 'react-icons/tb';
 
 import * as classes from './MenuList.module.scss';
 const cx = classNames.bind(classes);
 
 import { useAppState, useMenuSettings, useMappedMenuProperties } from '../../state';
-import { WindowWithAPIs } from '../../settings-window-api';
 
 import { Scrollbox, ThemedIcon, Swirl, Note, Button } from '../common';
 import CollectionDetails from './CollectionDetails';
 import { ensureUniqueKeys } from '../../utils';
-
-declare const window: WindowWithAPIs;
 
 /** For rendering the menus, a list of these objects is created. */
 type RenderedMenu = {
@@ -175,7 +175,7 @@ export default function MenuList() {
 
             {renderedMenus.map((menu) => {
               return (
-                <button
+                <div
                   key={menu.key}
                   draggable
                   className={cx({
@@ -183,7 +183,7 @@ export default function MenuList() {
                     selected: menu.index === selectedMenu,
                     dragging: dragIndex === menu.index,
                   })}
-                  type="button"
+                  tabIndex={0}
                   onClick={() => selectMenu(menu.index)}
                   onDragEnd={() => {
                     moveMenu(dragIndex, dropIndex);
@@ -289,16 +289,73 @@ export default function MenuList() {
                       deleteMenu(menu.index);
                     }
                   }}>
-                  <div style={{ display: 'flex' }}>
+                  <div
+                    style={{ display: 'flex', justifyContent: 'space-between', flex: 1 }}>
                     <div style={{ flexShrink: 0, width: 32, marginRight: 10 }}>
                       <ThemedIcon name={menu.icon} theme={menu.iconTheme} />
                     </div>
-                    <div style={{ minWidth: 0 }}>
+                    <div style={{ minWidth: 0, flexGrow: 1 }}>
                       <div className={classes.menuTitle}>{menu.name}</div>
                       <div className={classes.menuSubtitle}>{menu.shortcut}</div>
                     </div>
+
+                    <div
+                      className={cx({
+                        toolButtonContainer: true,
+                      })}>
+                      <div
+                        className={cx({
+                          toolButton: true,
+                        })}
+                        data-tooltip-content="Preview Menu"
+                        data-tooltip-id="main-tooltip"
+                        onClick={() => window.settingsAPI.openMenu(selectedMenu)}>
+                        <ThemedIcon name="preview-menu.svg" theme="kando" />
+                      </div>
+                      <div
+                        className={cx({
+                          toolButton: true,
+                        })}
+                        data-tooltip-content="More Options"
+                        data-tooltip-id="main-tooltip"
+                        onClick={() =>
+                          window.ipcAPI.showMenu(
+                            'Menu Options',
+                            'open-menu.svg',
+                            'kando',
+                            [
+                              {
+                                name: i18next.t('settings.duplicate-menu'),
+                                icon: 'content_copy',
+                                iconTheme: 'material-symbols-rounded',
+                                callback: () => {
+                                  duplicateMenu(selectedMenu);
+                                },
+                              },
+                              {
+                                name: i18next.t('settings.delete-menu'),
+                                icon: 'delete',
+                                iconTheme: 'material-symbols-rounded',
+                                callback: () => {
+                                  deleteMenu(selectedMenu);
+                                },
+                              },
+                              {
+                                name: 'Export Menu',
+                                icon: 'upload_2',
+                                iconTheme: 'material-symbols-rounded',
+                                callback: () => {
+                                  window.settingsAPI.exportMenu(selectedMenu);
+                                },
+                              },
+                            ]
+                          )
+                        }>
+                        <ThemedIcon name="open-menu.svg" theme="kando" />
+                      </div>
+                    </div>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
@@ -318,48 +375,12 @@ export default function MenuList() {
           />
           <Button
             isGrouped
-            icon={<TbCopy />}
-            size="large"
-            tooltip={i18next.t('settings.duplicate-menu')}
-            variant="floating"
-            onClick={() => {
-              duplicateMenu(selectedMenu);
-            }}
-          />
-          <Button
-            isGrouped
-            icon={<TbUpload />}
-            size="large"
-            tooltip={i18next.t('settings.export-menu')}
-            variant="floating"
-            onClick={async () => {
-              if (selectedMenu < 0 || selectedMenu >= menus.length) {
-                return;
-              }
-
-              // Let the main process show the save dialog and perform the export.
-              await window.settingsAPI.exportMenu(selectedMenu);
-            }}
-          />
-          <Button
-            isGrouped
             icon={<TbDownload />}
             size="large"
             tooltip={i18next.t('settings.import-menu')}
             variant="floating"
-            onClick={async () => {
-              // Let the main process show the open dialog and perform the import.
-              await window.settingsAPI.importMenu();
-            }}
-          />
-          <Button
-            isGrouped
-            icon={<TbTrash />}
-            size="large"
-            tooltip={i18next.t('settings.delete-menu')}
-            variant="floating"
             onClick={() => {
-              deleteMenu(selectedMenu);
+              window.settingsAPI.importMenu();
             }}
           />
         </div>
