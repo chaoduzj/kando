@@ -308,7 +308,9 @@
             "wlroots-pointer-get-timeout-default-behavior-info": "Détermine la position supposée du curseur si aucune position n'a pu être obtenue à partir des backends basés sur wlroots dans le délai configuré.",
             "previously-reported": "Précédemment signalé",
             "enable-achievement-notifications-info": "Si cette option est activée, des notifications s'affichent lorsque des succès sont débloqués.",
-            "enable-achievement-notifications": "Afficher les notifications de succès"
+            "enable-achievement-notifications": "Afficher les notifications de succès",
+            "windows-ink-workaround-info": "Cela permet de contourner le problème qui empêche d'obtenir la position du stylet lorsque Windows Ink est activé. Cela introduit un délai de 100 ms avant l'ouverture du menu. Si vous n'utilisez pas de stylet, vous pouvez donc désactiver cette fonctionnalité pour que le menu s'ouvre plus rapidement.",
+            "windows-ink-workaround": "Contourner Windows-Ink"
         },
         "hover-mode": "Mode Survol",
         "hover-mode-info": "Pour utilisateurs expérimentés seulement ! Sélectionne les éléments en les survolant.",
@@ -317,7 +319,7 @@
             "search-placeholder": "Rechercher des Icônes…",
             "url-example": "Exemple d'URL :",
             "base64-hint": "Les icônes encodées en Base64 permettent d'inclure facilement n'importe quel type d'icône dans vos menus. Vous pouvez utiliser un service comme [www.base64-image.de] ({{link}}) pour convertir n'importe quelle image en une chaîne codée en Base64. Cela fonctionne même pour les gifs animés !",
-            "file-example": "file: exemple URI :",
+            "file-example": "file : exemple URI :",
             "hint": "Apprenez [ici]({{link}}) comment ajouter ou créer vos propres thèmes d'icônes.",
             "reload-button-tooltip": "Recharger tous les icônes"
         },
@@ -474,7 +476,9 @@
         },
         "export-menu-error-title": "Échec de l'exportation du menu",
         "import-menu-error-title": "Échec de l'importation du menu",
-        "import-menu-error-message": "Le fichier sélectionné n'a pas pu être importé. Il ne contient pas de menu Kando valide."
+        "import-menu-error-message": "Le fichier sélectionné n'a pas pu être importé. Il ne contient pas de menu Kando valide.",
+        "export-menu": "Exporter le menu",
+        "import-menu": "Importer le menu"
     },
     "achievements": {
         "attributes": {

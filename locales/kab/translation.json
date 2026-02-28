@@ -71,7 +71,15 @@
             "reload-sound-theme": "Ales asali n usentel n imesli",
             "dev-tools-note": "Kando iseqdac sin n yisfuyla: Yiwen i wumuɣ, yiwen i yiɣewwaṛen. Tzemreḍ ad teldiḍ ifecka n tneflit akken ad tsewḍeḍ yal yiwen seg sin n yisfuyla-agi.",
             "menu-window-dev-tools": "Umuɣ n usweḍ",
-            "settings-window-dev-tools": "Iɣewwaṛen n usweḍ"
+            "settings-window-dev-tools": "Iɣewwaṛen n usweḍ",
+            "center": "Di tlemmast",
+            "backup-and-restore": "Aḥraz akked Tiririt",
+            "previously-reported": "Yettwammel yakan",
+            "backup-menus": "Ḥrez menus.json…",
+            "backup-settings": "Ḥrez config.json…",
+            "restore-menus": "Err-d menus.json…",
+            "restore-settings": "Err-d config.json…",
+            "developer-options": "Tinefrunin n uneflay"
         },
         "introduction-dialog": {
             "slide3-hint1": "Tzemreḍ daɣen ad tsiteḍ dagi akken ad tmedleḍ umuɣ.",
@@ -189,7 +197,16 @@
             "countdown_other": "Afran deg {{count}} n tasinin…",
             "confirm": "Seqdec azal-agi"
         },
-        "restore-general-settings-warning-message": "Ayagi ad isemselsi iɣewwaṛen n usnas amiran akked igburen n ufaylu n uḥraz yettwafernen! Umuɣen-ik·im akked tigrummiwin n wumuɣ ur ttwaḥaz ara."
+        "restore-general-settings-warning-message": "Ayagi ad isemselsi iɣewwaṛen n usnas amiran akked igburen n ufaylu n uḥraz yettwafernen! Umuɣen-ik·im akked tigrummiwin n wumuɣ ur ttwaḥaz ara.",
+        "area-condition-tooltip": "Fren taɣzut n ugdil",
+        "window-condition": "Ad yeddu kan i yizwilen n usfaylu usdiden",
+        "window-condition-placeholder": "Azwel n usfaylu",
+        "window-condition-tooltip": "Fren asfaylu",
+        "area-condition": "Ad yeddu kan i Taɣzut n ugdil tusdidt",
+        "area-condition-top-placeholder": "Uksawen",
+        "area-condition-left-placeholder": "Azelmaḍ",
+        "area-condition-bottom-placeholder": "Ukessar",
+        "area-condition-right-placeholder": "Ayeffus"
     },
     "menu-items": {
         "command": {
@@ -199,12 +216,69 @@
             "placeholder": "Ger taladna…",
             "isolated": "Selkem s wudem n uɛzal",
             "detached": "Selkem s wudem n war amsedday",
-            "tip-1": "Tzemreḍ ad tesqedceḍ anaw n uferdis n tladna i usenker n yisnasen neɣ iskripten."
+            "tip-1": "Tzemreḍ ad tesqedceḍ anaw n uferdis n tladna i usenker n yisnasen neɣ iskripten.",
+            "tip-3": "Seqdec {{app_name}} akken ad tegreḍ isem n usnas yellan yermed mi ara teldiḍ umuɣ.",
+            "tip-4": "Seqdec {{window_name}} akken ad tegreḍ isem n usfaylu yellan yermed mi ara teldiḍ umuɣ.",
+            "tip-5": "Seqdec {{pointer_x}} akked {{pointer_y}} iwakken ad tegreḍ ideg usewweṛ ɣer wanda yella wumuɣ yeldi.",
+            "tip-6": "Sit ɣef [here] {{link}} iwakken ad tlemdeḍ amek ara d-tafeḍ tiludna i usekker n yisnasen-ik·im."
+        },
+        "uri": {
+            "tip-3": "Tzemreḍ ad tesqedceḍ aferdis URI akken ad teldiḍ aseɣwen: mailto.",
+            "tip-4": "Seqdec {{app_name}} akken ad tegreḍ isem n usnas i d-ildin mi teldiḍ umuɣ.",
+            "tip-5": "Seqdec {{window_name}} akken ad tegreḍ isem n usfaylu i d-ildin mi teldiḍ umuɣ.",
+            "tip-6": "Seqdec {{pointer_x}} akked {{pointer_y}} ad tegreḍ ideg n usewwaṛ mi teldiḍ umuɣ.",
+            "name": "Ldi URI",
+            "description": "Ldi ismal web d ugar nniḍen.",
+            "placeholder": "Ger URI tebɣiḍ…",
+            "tip-1": "Tzemreḍ ad tesqedceḍ anaw n uferdis URI akken ad teldiḍ asmel web s useqdec n uneggaf http://."
+        },
+        "common": {
+            "inhibit-shortcuts": "Sens inegzumen"
+        },
+        "file": {
+            "name": "Ldi Afaylu",
+            "description": "Ldi afaylu neɣ akaram.",
+            "placeholder": "Fren afaylu neɣ akaram…",
+            "tip-1": "Tzemreḍ ad tesqedceḍ anaw-agi n uferdis akken ad teldiḍ ifuyla neɣ ikaramen."
+        },
+        "hotkey": {
+            "name": "Serwes anegzum n unasiw",
+            "description": "Sit ɣef usuddes n tsura.",
+            "hotkey": "Inegzumen",
+            "recording-placeholder": "Aru anegzum n unasiw…",
+            "tip-3": "Sif ɣef [this link]{{link}} akken ad twaliḍ akk ismawen n tsarut tameɣtut."
+        },
+        "macro": {
+            "name": "Selkem amakṛu",
+            "description": "Aru amakṛu n unasiw.",
+            "placeholder": "Tekki ɣef tqeffalt n usekles akken ad tebduḍ asekles!",
+            "recording-placeholder": "Tekki ɣef kra n tsura…"
+        },
+        "redirect": {
+            "description": "Ldi umuɣ nniḍen.",
+            "name": "Sɛeddi ɣer wansi nniḍen"
+        },
+        "settings": {
+            "name": "Ldi iɣewwaṛen",
+            "description": "Ldi asfaylu n yiɣewwaṛen n Kando.",
+            "tip-1": "Anaw-agi n uferdis ad yeldi asfaylu n iɣewwaṛen n Kando."
+        },
+        "submenu": {
+            "name": "Umuɣ anaddaw",
+            "description": "Yegber iferdisen-nniḍen n wumuɣ.",
+            "tip-1": "Umuɣ anaddaw yezmer ad yettwaseqdec i wegraw n iferdisen."
+        },
+        "text": {
+            "name": "Senṭeḍ aḍris",
+            "description": "Ad iger aḍris i d-ittunefken.",
+            "placeholder": "Ger aḍris tebɣiḍ…",
+            "tip-1": "Tigawt-agi ad seqdec tacfawit-k·m i usenṭeḍ n uḍris. Seld aseqdec n tigawt-agi, tacfawit ad tegber aḍris."
         }
     },
     "achievements": {
         "added-items": {
-            "description": "Snulfu-d {{n}} n yiferdisen deg umaẓrag n wumuɣ."
+            "description": "Snulfu-d {{n}} n yiferdisen deg umaẓrag n wumuɣ.",
+            "name": "Tarrayt n Kando {{tier}}"
         },
         "deleted-all-menus": {
             "name": "Sfeḍ Aduju",
@@ -219,13 +293,16 @@
             "description": "Rnu aferdis n wumuɣ ɣer wumuɣ anaddaw yesɛan kuẓ n yiswiren."
         },
         "sponsors-viewed": {
-            "name": "Aɛessas n Kando"
+            "name": "Aɛessas n Kando",
+            "description": "Xemmem ad teqqleḍ d aṣpunṣur n Kando."
         },
         "menu-themes-selected": {
-            "description": "Senfel asentel n wumuɣ {{n}} n tikkal."
+            "description": "Senfel asentel n wumuɣ {{n}} n tikkal.",
+            "name": "Tarrayt n Wucbiḥ"
         },
         "tutorial-viewed": {
-            "name": "Yebda-d usikel"
+            "name": "Yebda-d usikel",
+            "description": "Fak adlisfus n unekcum n Kando."
         },
         "many-selections-streak": {
             "name": "Ifassen n lebraq {{tier}}",
@@ -235,7 +312,62 @@
             "name": "D arurad ugar ɣef uxemmem {{tier}}",
             "description": "Egg {{n}} n ifran uḍfiren deg tlemmast s tɣawla ugar n {{time}} n tasinin."
         },
-        "completed-title": "Iswi yettwarẓem!"
+        "completed-title": "Iswi yettwarẓem!",
+        "gesture-selector": {
+            "description": "Fren {{n}} n yiferdisen s uskar turbu neɣ n ucraḍ.",
+            "name": "{{attribute}} Tazmert n Ninja"
+        },
+        "settings-opened": {
+            "name": "D asikel i d araz {{tier}}",
+            "description": "Ldi tankult n udiwenni n yiɣewwaṛen {{n}} n tikkal."
+        },
+        "backup": {
+            "description": "Ḥrez iɣewwaṛen neɣ umuɣen-ik·im {{n}} n tikkal."
+        },
+        "restore": {
+            "name": "Tagnit tis snat {{tier}}",
+            "description": "Err-d aḥras {{n}} n tikkal."
+        },
+        "attributes": {
+            "novice": "Abujad",
+            "capable": "Yezmer",
+            "skilled": "Iẓweṛ",
+            "expert": "Amazzay",
+            "master": "D asdegdeg"
+        },
+        "tier": {
+            "I": "I",
+            "II": "II",
+            "III": "III",
+            "IV": "IV",
+            "V": "V"
+        },
+        "cancelor": {
+            "name": "Abrid n Yilem {{tier}}",
+            "description": "Sefsex tafrayt {{n}} n tikkal."
+        },
+        "selector": {
+            "name": "{{attribute}} Samuray",
+            "description": "Fren {{n}} n yiferdisen."
+        },
+        "depth-selector": {
+            "name1": "{{attribute}} Amegzam",
+            "name2": "{{attribute}} Amegzam n sin Tissi",
+            "name3": "{{attribute}} Amegzam lqayen",
+            "description": "Fren {{n}} n yiferdisen ɣer telqayt {{depth}} deg ma drus {{time}} n mili-tasint."
+        },
+        "click-selector": {
+            "name": "{{attribute}} Alɣuɣ n usiti",
+            "description": "Fren {{n}} n yiferdisen s usiti n tɣerdayt."
+        },
+        "keyboard-selector": {
+            "name": "{{attribute}} Asaḍ n inegzumen",
+            "description": "Fren {{n}} n yiferdisen s unasiw-ik·im."
+        },
+        "gamepad-selector": {
+            "name": "{{attribute}} Amgara n ufus usenqed n wuraren",
+            "description": "Fren {{n}} n yiferdisen s useqdec n ufus usenqed n wuraren."
+        }
     },
     "main": {
         "new-version-notification-header": "Yella lqem amaynut n Kando!",
@@ -284,7 +416,23 @@
             "previous-track": "Tazribt tuzwirt"
         },
         "windows": {
-            "submenu": "Isfuyla"
+            "submenu": "Isfuyla",
+            "mission-control": "Asenqed n tuɣdaḍt",
+            "toggle-maximize": "Qluqel asemɣer afellay",
+            "tile-right": "Fser ɣer uyeffus",
+            "close-window": "Mdel Asfaylu",
+            "tile-left": "Fser ɣer uzelmaḍ"
+        },
+        "previous-workspace": "Tallunt n umahil tuzwirt",
+        "bookmarks": {
+            "submenu": "isɣalen",
+            "downloads": "Isidar",
+            "videos": "Ividyuten",
+            "pictures": "Tiwlafin",
+            "documents": "Isemliyen",
+            "desktop": "Tanarit",
+            "home": "Agejdan",
+            "music": "Aẓawan"
         }
     }
 }
