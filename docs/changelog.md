@@ -23,12 +23,12 @@ This changelog follows the rules of [Keep a Changelog](http://keepachangelog.com
 
 ### :tada: Added
 
-- Added the possibility to include color presets in menu themes. It is even possible to make your own color presets and share them with the community!  Thanks to [@Yar2000T](https://github.com/Yar2000T) and [@elfi-ox](https://github.com/elfi-ox) for this contribution!
-- Added the possibility to import and export individual menus via JSON files. Thanks to [@Yar2000T](https://github.com/Yar2000T) for this contribution!
-- Added the possibility to temporarily disable all Kando shortcuts while simulating hotkeys or executing macros. This is useful if you want to use a shortcut which is also used by Kando to trigger a menu. Surprisingly, this required a complete rewrite of how the binding of shortcuts works, so feel free to report any issues you encounter with shortcuts!
-- Added a "Maximum Selection Radius" setting. If this is set to a value greater than 0, clicks outside this radius will close the menu. This has been requested several times and should make it easier to use Kando on big screens. However keep in mind, that this will usually make your selections slower as you have to be more precise with your mouse movements.
-- Added an option to disable achievement notifications. This can be found in the general settings dialog.
-- Added an option on Windows to disable the workaround for the issue where getting the stylus position is not possible with Windows Ink enabled. This workaround introduces a delay of 100ms before opening the menu, so if you don't use a stylus, you can disable it to make the menu open faster.
+- The possibility to include color presets in menu themes. It is even possible to make your own color presets and share them with the community!  Thanks to [@Yar2000T](https://github.com/Yar2000T) and [@elfi-ox](https://github.com/elfi-ox) for this contribution!
+- The possibility to import and export individual menus via JSON files. Thanks to [@Yar2000T](https://github.com/Yar2000T) for this contribution!
+- The possibility to temporarily disable all Kando shortcuts while simulating hotkeys or executing macros. This is useful if you want to use a shortcut which is also used by Kando to trigger a menu. Surprisingly, this required a complete rewrite of how the binding of shortcuts works, so feel free to report any issues you encounter with shortcuts!
+- A "Maximum Selection Radius" setting. If this is set to a value greater than 0, clicks outside this radius will close the menu. This has been requested several times and should make it easier to use Kando on big screens. However keep in mind, that this will usually make your selections slower as you have to be more precise with your mouse movements.
+- An option to disable achievement notifications. This can be found in the general settings dialog.
+- An option on Windows to disable the workaround for the issue where getting the stylus position is not possible with Windows Ink enabled. This workaround introduces a delay of up to 100ms before opening the menu, so if you don't use a stylus, you can disable it to make the menu open faster.
 - Some wlroots-specific options to handle the case where no pointer position is available. There are some timeouts which can now be configured in the settings dialog. Thanks to [@make-42](https://github.com/make-42) for this contribution!
 - Many translation updates: **Thanks to all the contributors!**
 
@@ -40,9 +40,9 @@ This changelog follows the rules of [Keep a Changelog](http://keepachangelog.com
 
 ### :bug: Fixed
 
-- Fixed a regression which caused the animation of menu items to be skipped when closing the menu.
-- Fixed an issue where the color pickers in the settings dialog would glitch out. Thanks to [@Haruto-works333](https://github.com/Haruto-works333) for this contribution!
-- Fixed an issue where Kando would not open a menu on Niri if no pointer device was connected. Thanks to [@make-42](https://github.com/make-42) for fixing this!
+- A regression which caused the animation of menu items to be skipped when closing the menu.
+- An issue where the color pickers in the settings dialog would glitch out. Thanks to [@Haruto-works333](https://github.com/Haruto-works333) for this contribution!
+- An issue where Kando would not open a menu on Niri if no pointer device was connected. Thanks to [@make-42](https://github.com/make-42) for fixing this!
 
 ## [Kando 2.2.0](https://github.com/kando-menu/kando/releases/tag/v2.2.0)
 
