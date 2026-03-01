@@ -363,6 +363,15 @@ export default function GeneralSettingsDialog() {
             {i18next.t('settings.general-settings-dialog.advanced-menu-options-note')}
           </Note>
           <SettingsSpinbutton
+            info={i18next.t('settings.general-settings-dialog.max-selection-radius-info')}
+            label={i18next.t('settings.general-settings-dialog.max-selection-radius')}
+            max={9999}
+            min={0}
+            settingsKey="maxSelectionRadius"
+            step={50}
+            width={spinbuttonWidth}
+          />
+          <SettingsSpinbutton
             info={i18next.t(
               'settings.general-settings-dialog.center-click-zone-radius-info'
             )}

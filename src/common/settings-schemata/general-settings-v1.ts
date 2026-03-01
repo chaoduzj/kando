@@ -117,6 +117,12 @@ export const GENERAL_SETTINGS_SCHEMA_V1 = z.object({
    */
   windowsInkWorkaround: z.boolean().default(true),
 
+  /**
+   * If set to a value greater than 0, items will only be selectable within this radius.
+   * Clicks outside of this radius will close the menu.
+   */
+  maxSelectionRadius: z.number().min(0).default(0),
+
   /** Clicking inside this radius will select the parent element. */
   centerDeadZone: z.number().min(0).default(50),
 

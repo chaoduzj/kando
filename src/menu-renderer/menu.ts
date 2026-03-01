@@ -399,6 +399,12 @@ export class Menu extends EventEmitter {
         }
         return;
       }
+
+      // If there is no hovered, clicked or dragged item, the user most likely clicked
+      // somewhere outside of the menu.
+      if (type === SelectionType.eActiveItem && item === null) {
+        this.cancel();
+      }
     };
 
     this.pointerInput.onCloseMenu(onCloseMenu);
@@ -610,7 +616,7 @@ export class Menu extends EventEmitter {
     // case where we selected the root item. In this case, we simply position the root
     // element at the mouse position.
     if (item === this.root) {
-      this.root.position = this.showMenuOptions.anchoredMode
+      this.root.relativePosition = this.showMenuOptions.anchoredMode
         ? this.getInitialMenuPosition()
         : coords || this.latestInput.absolutePosition;
     } else {
@@ -621,14 +627,14 @@ export class Menu extends EventEmitter {
 
       if (!this.showMenuOptions.anchoredMode) {
         if (selectedParent) {
-          distance = math.getLength(item.position);
+          distance = math.getLength(item.relativePosition);
         } else {
           distance = Math.max(this.settings.minParentDistance, this.latestInput.distance);
         }
       }
 
       // Compute the item's position based on its angle the computed distance.
-      item.position = math.getDirection(item.angle, distance);
+      item.relativePosition = math.getDirection(item.angle, distance);
 
       // Now we want to move the root item so that the newly selected item is at the given
       // coordinates or at the mouse position. In anchored mode we want to always use the
@@ -642,7 +648,7 @@ export class Menu extends EventEmitter {
       }
 
       const offset = math.subtract(targetAbsolutePosition, this.getCenterItemPosition());
-      this.root.position = math.add(this.root.position, offset);
+      this.root.relativePosition = math.add(this.root.relativePosition, offset);
     }
 
     // Clamp the position of the newly selected submenu to the viewport. We warp the mouse
@@ -666,7 +672,7 @@ export class Menu extends EventEmitter {
           this.emit('move-pointer', offset);
         }
 
-        this.root.position = math.add(this.root.position, offset);
+        this.root.relativePosition = math.add(this.root.relativePosition, offset);
       }
 
       // Update the mouse info based on the newly selected item's position.
@@ -953,6 +959,38 @@ export class Menu extends EventEmitter {
       return this.root;
     }
 
+    // If we are currently not in marking mode or turbo mode and the user hovers outside
+    // of the menu, there is no hovered item. If showing the root menu item, we consider
+    // "outside of the menu" to be any position far away from the center. If showing a
+    // submenu, we consider "outside of the menu" to be any position far away from the
+    // line connecting the submenu to its parent.
+    if (
+      this.latestInput.button !== ButtonState.eDragged &&
+      this.settings.maxSelectionRadius > 0
+    ) {
+      let minDistance = this.latestInput.distance;
+
+      if (this.selectionChain.length > 1) {
+        const connectorEnd = this.getCenterItemPosition();
+        const connectorStart = math.subtract(
+          connectorEnd,
+          this.selectionChain[this.selectionChain.length - 1].relativePosition
+        );
+
+        const distance = math.getDistanceToLineSegment(
+          this.latestInput.absolutePosition,
+          connectorStart,
+          connectorEnd
+        );
+
+        minDistance = Math.min(minDistance, distance);
+      }
+
+      if (minDistance > this.settings.maxSelectionRadius) {
+        return null;
+      }
+    }
+
     // If the mouse is not in the center, check if it is in one of the children of the
     // currently selected item.
     const currentItem = this.selectionChain[this.selectionChain.length - 1];
@@ -985,7 +1023,7 @@ export class Menu extends EventEmitter {
     for (let i = 0; i < this.selectionChain.length; i++) {
       const item = this.selectionChain[i];
 
-      item.nodeDiv.style.transform = `translate(${item.position.x}px, ${item.position.y}px)`;
+      item.nodeDiv.style.transform = `translate(${item.relativePosition.x}px, ${item.relativePosition.y}px)`;
 
       if (i === this.selectionChain.length - 1) {
         let hoveredAngle = this.hoveredItem?.angle;
@@ -1003,14 +1041,14 @@ export class Menu extends EventEmitter {
         for (let j = 0; j < item.children?.length; ++j) {
           const child = item.children[j] as RenderedMenuItem;
           if (child === this.draggedItem || child === this.clickedItem) {
-            child.position = this.latestInput.relativePosition;
-            child.nodeDiv.style.transform = `translate(${child.position.x}px, ${child.position.y}px)`;
+            child.relativePosition = this.latestInput.relativePosition;
+            child.nodeDiv.style.transform = `translate(${child.relativePosition.x}px, ${child.relativePosition.y}px)`;
           } else {
             // Set the custom CSS properties of the item, like the angular difference between
             // the item and the mouse pointer direction.
             this.theme.setChildProperties(child, this.latestInput.angle);
             child.nodeDiv.style.transform = '';
-            delete child.position;
+            delete child.relativePosition;
           }
         }
       }
@@ -1061,9 +1099,9 @@ export class Menu extends EventEmitter {
         let length = 0;
         let angle = nextItem.angle;
 
-        if (nextItem.position) {
-          length = drawConnector ? math.getLength(nextItem.position) : 0;
-          angle = math.getAngle(nextItem.position);
+        if (nextItem.relativePosition) {
+          length = drawConnector ? math.getLength(nextItem.relativePosition) : 0;
+          angle = math.getAngle(nextItem.relativePosition);
         }
 
         angle = math.getClosestEquivalentAngle(angle, item.lastConnectorAngle);
@@ -1218,14 +1256,14 @@ export class Menu extends EventEmitter {
     }
 
     const position = {
-      x: this.root.position.x,
-      y: this.root.position.y,
+      x: this.root.relativePosition.x,
+      y: this.root.relativePosition.y,
     };
 
     for (let i = 1; i < this.selectionChain.length; ++i) {
       const item = this.selectionChain[i];
-      position.x += item.position.x;
-      position.y += item.position.y;
+      position.x += item.relativePosition.x;
+      position.y += item.relativePosition.y;
     }
 
     return position;

@@ -41,6 +41,29 @@ export function getDistance(vec1: Vec2, vec2: Vec2): number {
   return getLength({ x: vec1.x - vec2.x, y: vec1.y - vec2.y });
 }
 
+/** This method returns the distance of a point to a line segment defined by two points. */
+export function getDistanceToLineSegment(
+  point: Vec2,
+  lineStart: Vec2,
+  lineEnd: Vec2
+): number {
+  const lineVec = subtract(lineEnd, lineStart);
+  const lineLength = getLength(lineVec);
+  const lineDir = multiply(lineVec, 1 / lineLength);
+
+  const pointVec = subtract(point, lineStart);
+  const projectionLength = pointVec.x * lineDir.x + pointVec.y * lineDir.y;
+
+  if (projectionLength < 0) {
+    return getDistance(point, lineStart);
+  } else if (projectionLength > lineLength) {
+    return getDistance(point, lineEnd);
+  }
+
+  const projectionPoint = add(lineStart, multiply(lineDir, projectionLength));
+  return getDistance(point, projectionPoint);
+}
+
 /** This adds two Vec2 together. */
 export function add(vec1: Vec2, vec2: Vec2): Vec2 {
   return { x: vec1.x + vec2.x, y: vec1.y + vec2.y };
