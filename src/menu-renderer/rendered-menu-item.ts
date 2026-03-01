@@ -45,7 +45,7 @@ export type RenderedMenuItem = {
    * Once a menu item is selected, it will be drawn at a specific distance from the parent
    * menu. This property stores the relative position of the menu item.
    */
-  position?: Vec2;
+  relativePosition?: Vec2;
 
   /**
    * The tree of menu items consists of these `nodeDiv`s. The child items of a menu item

@@ -172,8 +172,7 @@
     }
   }
 
-  &.parent>.active:not(:has(.hovered))>.ring-slow-layer,
-  &.active.hovered>.ring-slow-layer {
+  &.active:not(:has(>.hovered))>.ring-slow-layer {
     opacity: 1;
 
     &::before {
