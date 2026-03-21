@@ -58,5 +58,5 @@ export function getItemTips(type: string): string[] {
     settings: getSettingsItemTips(),
   };
 
-  return tips[type] || null;
+  return tips[type] || [];
 }
