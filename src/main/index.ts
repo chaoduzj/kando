@@ -239,7 +239,7 @@ try {
     .then(() => kando.init())
     .then(() => {
       // Show a nifty message when the app is about to quit.
-      app.on('will-quit', async () => {
+      app.on('before-quit', async () => {
         await kando.quit();
         console.log('Good-Pie :)');
       });

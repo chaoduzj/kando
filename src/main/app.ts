@@ -100,6 +100,9 @@ export class KandoApp {
   /** This will cache the icon themes. */
   private iconThemesCache?: IconThemesInfo;
 
+  /** Flag to indicate if the app is quitting. */
+  private isQuitting = false;
+
   /**
    * Most of the initialization is done in the init() method. This constructor is only
    * used to set up the hidden menu bar as this has to be done before the Electron app is
@@ -294,6 +297,11 @@ export class KandoApp {
 
   /** This is called when the app is closed. It will unbind all shortcuts. */
   public async quit() {
+    this.isQuitting = true;
+
+    this.menuWindow?.destroy();
+    this.settingsWindow?.destroy();
+
     if (this.backend != null) {
       await this.backend.deinit();
     }
@@ -517,8 +525,10 @@ export class KandoApp {
 
     // Make sure that closing the menu window just hides it instead of actually closing it.
     this.menuWindow.on('close', (event) => {
-      event.preventDefault();
-      this.menuWindow.hide();
+      if (!this.isQuitting) {
+        event.preventDefault();
+        this.menuWindow.hide();
+      }
     });
   }
 
