@@ -21,6 +21,10 @@ This changelog follows the rules of [Keep a Changelog](http://keepachangelog.com
 
 **Release Date:** 2026-04-18
 
+<a href="https://www.youtube.com/watch?v=I5SCWVLgv3E">
+<img align="right" width="400px" src="img/player23.jpg"></img>
+</a>
+
 Beware that this release adds some changes which **may break** some functionality for Hyprland and KDE users only.
 They are marked with a **:collision:** emoji below.
 
