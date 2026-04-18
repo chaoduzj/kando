@@ -17,9 +17,9 @@ Security   - in case of vulnerabilities.
 Kando uses [semantic versioning](https://semver.org).
 This changelog follows the rules of [Keep a Changelog](http://keepachangelog.com/).
 
-## [Unreleased]
+## [Kando 2.3.0](https://github.com/kando-menu/kando/releases/tag/v2.3.0)
 
-**Release Date:** TBD
+**Release Date:** 2026-04-18
 
 Beware that this release adds some changes which **may break** some functionality for Hyprland and KDE users only.
 They are marked with a **:collision:** emoji below.

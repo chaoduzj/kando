@@ -28,8 +28,7 @@
         </p>
         <p>
             Kando is designed to be used with 🖱️ mouse, 🖊️ stylus, 👆 touch, or 🎮 controller input.
-            If you have both hands at your keyboard most of the time, Kando is maybe not the right
-            tool for you.
+            However, Kando can also be efficiently controlled with a keyboard.
         </p>
         <p>
             If you are using Kando on Wayland, some additional setup may be required. For instance,
@@ -82,6 +81,9 @@
     </screenshots>
 
     <releases>
+        <release version="2.3.0" date="2026-04-18">
+            <url type="details">https://github.com/kando-menu/kando/releases/tag/v2.3.0</url>
+        </release>
         <release version="2.2.0" date="2026-01-17">
             <url type="details">https://github.com/kando-menu/kando/releases/tag/v2.2.0</url>
         </release>
