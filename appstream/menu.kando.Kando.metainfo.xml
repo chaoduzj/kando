@@ -43,6 +43,7 @@
     <url type="donation">https://kando.menu/donating/</url>
     <url type="translate">https://hosted.weblate.org/engage/kando/</url>
     <url type="help">https://discord.gg/hZwbVSDkhy</url>
+    <url type="vcs-browser">https://github.com/kando-menu/kando</url>
 
     <launchable type="desktop-id">menu.kando.Kando.desktop</launchable>
 
