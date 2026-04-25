@@ -39,7 +39,7 @@ type Props = {
   readonly isDisabled?: boolean;
 
   /** The flat variant has no background color and shows the text centered. */
-  readonly variant?: 'normal' | 'flat';
+  readonly variant?: 'normal' | 'invisible';
 
   /**
    * Whether the text input should support multiple lines. In this case, the label will be
@@ -83,7 +83,7 @@ export default function TextInput(props: Props) {
           <input
             className={cx({
               input: true,
-              flat: props.variant === 'flat',
+              invisible: props.variant === 'invisible',
             })}
             disabled={props.isDisabled}
             placeholder={props.placeholder}
@@ -104,7 +104,7 @@ export default function TextInput(props: Props) {
         <textarea
           className={cx({
             input: true,
-            flat: props.variant === 'flat',
+            invisible: props.variant === 'invisible',
           })}
           disabled={props.isDisabled}
           placeholder={props.placeholder}

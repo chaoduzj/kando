@@ -18,7 +18,8 @@
   textarea {
     @include text-input;
 
-    border-radius: 5px 0 0 5px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 
     min-width: 0px;
     width: 100%;

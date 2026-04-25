@@ -8,20 +8,102 @@
 // SPDX-FileCopyrightText: Simon Schneegans <code@simonschneegans.de>
 // SPDX-License-Identifier: MIT
 
+@use 'sass:color';
+
 @use './variables.scss' as *;
 
 @mixin text-input {
+  color: $text-normal;
   background-color: $widget-normal;
 
-  color: $text-normal;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   box-sizing: border-box;
 
-  padding: 4px 6px;
+  cursor: text;
+
+  padding: 5px 10px;
   font-size: 1em;
 
   &:hover {
     background-color: $widget-normal-hover;
+  }
+}
+
+@mixin normal-button {
+  color: $text-normal;
+  background-color: $widget-normal;
+
+  border-radius: 6px;
+  box-sizing: border-box;
+  border: none;
+
+  transition: background-color 0.15s;
+
+  &.pressed {
+    background-color: $widget-normal-active;
+  }
+
+  &:not(.selected):hover {
+    background-color: $widget-normal-hover;
+  }
+
+  &:not(.selected):active {
+    transform: translateY(1px);
+  }
+}
+
+@mixin primary-button {
+  @include normal-button;
+
+  background-color: light-dark($key-light, $key-dark);
+
+  &:not(.selected):hover {
+    background-color: light-dark(
+      color.adjust($key-light, $lightness: -10%),
+      color.adjust($key-dark, $lightness: 10%)
+    );
+  }
+}
+
+@mixin invisible-button {
+  @include normal-button;
+
+  background-color: transparent;
+
+  &:not(.selected):hover {
+    background-color: $widget-normal;
+  }
+}
+
+@mixin tool-button {
+  @include normal-button;
+
+  background-color: transparent;
+  opacity: 0.7;
+
+  &:not(.selected):hover {
+    background-color: transparent;
+    opacity: 1;
+  }
+}
+
+@mixin raised-button {
+  @include normal-button;
+
+  background-color: $window-background;
+
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.075);
+  border: 1.5px solid #e5e5e5;
+
+  &:not(.selected):hover {
+    background-color: light-dark(
+      color.adjust($base-light, $lightness: -5%),
+      color.adjust($base-dark, $lightness: 10%)
+    );
+  }
+
+  &.selected {
+    border: $border-selected;
   }
 }

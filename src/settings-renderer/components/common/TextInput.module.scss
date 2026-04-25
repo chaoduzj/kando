@@ -16,12 +16,12 @@
   min-width: 0px;
   width: 100%;
 
-  &.flat {
+  &.invisible {
     background-color: transparent;
     text-align: center;
 
     &:hover {
-      background-color: $widget-light;
+      background-color: $widget-normal;
     }
   }
 

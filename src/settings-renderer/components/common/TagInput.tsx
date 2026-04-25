@@ -106,11 +106,20 @@ export default function TagInput(props: Props) {
             placeholder={
               props.tags.length === 0 ? i18next.t('settings.add-tags-placeholder') : ''
             }
+            onBlur={(event) => {
+              // Add tag on blur if the input field is not empty.
+              if (event.currentTarget.value !== '') {
+                const newTags = [...props.tags, event.currentTarget.value];
+
+                // Remove duplicates.
+                props.onChange(Array.from(new Set(newTags)));
+                event.currentTarget.value = '';
+              }
+            }}
             onKeyDown={(event) => {
               // Add tag on return if the input field is not empty.
               if (event.key === 'Enter' && event.currentTarget.value !== '') {
-                const newTags = [...props.tags];
-                newTags.push(event.currentTarget.value);
+                const newTags = [...props.tags, event.currentTarget.value];
 
                 // Remove duplicates.
                 props.onChange(Array.from(new Set(newTags)));
