@@ -17,6 +17,14 @@ Security   - in case of vulnerabilities.
 Kando uses [semantic versioning](https://semver.org).
 This changelog follows the rules of [Keep a Changelog](http://keepachangelog.com/).
 
+## [Unreleased]
+
+**Release Date:** TBD
+
+### :wrench: Changed
+
+- Updated many dependencies to their latest versions. Feel free to report any issues you encounter!
+
 ## [Kando 2.3.0](https://github.com/kando-menu/kando/releases/tag/v2.3.0)
 
 **Release Date:** 2026-04-18
