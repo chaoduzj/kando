@@ -91,10 +91,14 @@
 @mixin raised-button {
   @include normal-button;
 
-  background-color: $window-background;
+  background-color: light-dark($base-light, color.adjust($base-dark, $lightness: 5%));
 
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.075);
-  border: 1.5px solid #e5e5e5;
+  box-shadow: 0 2px 4px light-dark(rgba(0, 0, 0, 0.075), rgba(0, 0, 0, 0.2));
+  border: 1.5px solid
+    light-dark(
+      color.adjust($base-light, $lightness: -5%),
+      color.adjust($base-dark, $lightness: -5%)
+    );
 
   &:not(.selected):hover {
     background-color: light-dark(

@@ -14,5 +14,7 @@
 .select {
   @include text-input;
 
+  cursor: default;
+
   width: 100%;
 }
