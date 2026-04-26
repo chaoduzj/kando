@@ -16,6 +16,7 @@ import path from 'path';
 import json5 from 'json5';
 import { ipcMain, shell, Tray, Menu, app, nativeTheme, dialog } from 'electron';
 import i18next from 'i18next';
+import type { ParseKeys } from 'i18next';
 
 import { MenuWindow } from './menu-window';
 import { SettingsWindow } from './settings-window';
@@ -1731,7 +1732,7 @@ export class KandoApp {
    */
   private createExampleMenu(): MenuType {
     // To enable localization of the example menus, we need to lookup the strings with
-    // i18next after loading the menu structure from JSON. i18next-parser cannot extract
+    // i18next after loading the menu structure from JSON. i18next-cli cannot extract
     // the strings from JSON files, therefore we have to specify all strings from the
     // example menus here in a comment. This way, the parser will find them.
     /*
@@ -1790,7 +1791,7 @@ export class KandoApp {
     }
 
     const translate = (item: MenuItem) => {
-      item.name = i18next.t(item.name);
+      item.name = i18next.t(item.name as ParseKeys);
       if (item.children) {
         for (const child of item.children) {
           translate(child);
