@@ -1,0 +1,65 @@
+//////////////////////////////////////////////////////////////////////////////////////////
+//   _  _ ____ _  _ ___  ____                                                           //
+//   |_/  |__| |\ | |  \ |  |    This file belongs to Kando, the cross-platform         //
+//   | \_ |  | | \| |__/ |__|    pie menu. Read more on github.com/kando-menu/kando     //
+//                                                                                      //
+//////////////////////////////////////////////////////////////////////////////////////////
+
+// SPDX-FileCopyrightText: Simon Schneegans <code@simonschneegans.de>
+// SPDX-License-Identifier: MIT
+
+@use '../../variables.scss' as *;
+@use '../../mixins.scss' as *;
+@use 'sass:color';
+
+.container {
+  display: flex;
+  flex-direction: row;
+  min-height: 600px;
+  gap: 16px;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  margin-top: 12px;
+  padding: 16px 16px 0 0;
+
+  border-radius: 0 12px 0 12px;
+
+  background-color: light-dark(
+    color.adjust($base-light, $lightness: -3%),
+    color.adjust($base-dark, $lightness: 3%)
+  );
+}
+
+.category {
+  @include invisible-button;
+
+  font-size: 1.1em;
+  line-height: 1.1em;
+  margin-bottom: 8px;
+  padding: 12px 24px;
+
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+
+  border-left: 4px solid transparent;
+
+  &.active {
+    border-left: 4px solid $key-dark;
+    background-color: $widget-normal;
+  }
+}
+
+.options {
+  flex: 1;
+  padding: 24px 32px;
+}
+
+.optionsContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

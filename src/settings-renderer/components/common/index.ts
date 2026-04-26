@@ -12,6 +12,7 @@
 // settings dialog.
 
 export { default as Base64IconPicker } from './Base64IconPicker';
+export { default as Blossom } from './Blossom';
 export { default as Button } from './Button';
 export { default as Checkbox } from './Checkbox';
 export { default as ColorButton } from './ColorButton';

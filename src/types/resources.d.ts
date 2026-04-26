@@ -325,6 +325,7 @@ export default interface Resources {
       "general-settings-dialog": {
         "advanced-menu-options": "Advanced Menu Options",
         "advanced-menu-options-note": "Usually, you can leave these settings at their default values.",
+        "app-settings": "settings.general-settings-dialog.app-settings",
         "auto-language": "Use system language",
         "backup-and-restore": "Backup and Restore",
         "backup-menus": "Backup menus.json…",

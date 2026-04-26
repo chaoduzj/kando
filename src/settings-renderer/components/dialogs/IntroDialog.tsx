@@ -210,6 +210,7 @@ export default function IntroDialog() {
       icon={<IoSchool />}
       isVisible={introDialogVisible}
       maxWidth={950}
+      paddingLeft={0}
       title={i18next.t('settings.introduction-dialog.title')}
       onClose={() => setIntroDialogVisible(false)}>
       <div className={classes.container}>
@@ -233,7 +234,7 @@ export default function IntroDialog() {
               </li>
             ))}
           </ol>
-          <div style={{ marginTop: 'auto' }}>
+          <div style={{ marginTop: 'auto', marginLeft: '16px' }}>
             <SettingsCheckbox
               isFlipped
               label={i18next.t('settings.introduction-dialog.show-again')}
