@@ -10,6 +10,8 @@
 
 import React from 'react';
 
+import * as classes from './Blossom.module.scss';
+
 const blossom = require('../../../../assets/images/blossom_large.svg');
 
 type Props = {
@@ -31,6 +33,7 @@ type Props = {
 export default function Blossom(props: Props) {
   return (
     <img
+      className={classes.blossom}
       src={blossom}
       style={{
         position: 'absolute',
@@ -42,7 +45,6 @@ export default function Blossom(props: Props) {
         bottom: props.bottom,
         objectFit: 'cover',
         objectPosition: `${props.cropRight || 0}px ${props.cropBottom || 0}px`,
-        filter: 'grayscale(100%) opacity(0.3) blur(1px)',
       }}
     />
   );

@@ -24,6 +24,7 @@ import {
   SettingsSpinbutton,
   Modal,
   Note,
+  Swirl,
   Blossom,
 } from '../common';
 import classNames from 'classnames/bind';
@@ -234,6 +235,7 @@ export default function GeneralSettingsDialog() {
             )}
             settingsKey="enableAchievementNotifications"
           />
+          <Swirl marginBottom={20} marginTop={40} variant="2" width={350} />
         </>
       ),
     },
@@ -329,6 +331,7 @@ export default function GeneralSettingsDialog() {
             ]}
             settingsKey="sameShortcutBehavior"
           />
+          <Swirl marginBottom={20} marginTop={40} variant="2" width={350} />
         </>
       ),
     },
@@ -352,7 +355,8 @@ export default function GeneralSettingsDialog() {
             step={0.01}
             width={spinbuttonWidth}
           />
-          <Note isCentered useMarkdown marginTop={30}>
+          <Swirl marginBottom={20} marginTop={40} variant="2" width={350} />
+          <Note isCentered useMarkdown>
             {i18next.t('settings.general-settings-dialog.learn-how-to-add-sound-themes', {
               link: 'https://kando.menu/sound-themes/',
             })}
@@ -533,7 +537,8 @@ export default function GeneralSettingsDialog() {
               />
             </>
           )}
-          <Note isCentered marginTop={30}>
+          <Swirl marginBottom={20} marginTop={40} variant="2" width={350} />
+          <Note isCentered>
             {i18next.t('settings.general-settings-dialog.advanced-menu-options-note')}
           </Note>
         </>
@@ -581,10 +586,10 @@ export default function GeneralSettingsDialog() {
               }}
             />
           </div>
+          <Swirl marginBottom={20} marginTop={40} variant="2" width={350} />
           <Note
             isCentered
             useMarkdown
-            marginTop={30}
             onLinkClick={() => {
               window.settingsAPI.getConfigDirectory().then((dir) => {
                 window.open('file://' + dir, '_blank');
@@ -641,6 +646,7 @@ export default function GeneralSettingsDialog() {
               }}
             />
           </div>
+          <Swirl marginBottom={20} marginTop={40} variant="2" width={350} />
         </>
       ),
     },
@@ -668,7 +674,7 @@ export default function GeneralSettingsDialog() {
             </div>
           ))}
         </div>
-        <Blossom bottom={0} cropBottom={50} cropRight={50} right={0} size={250} />
+        <Blossom bottom={0} cropBottom={50} cropRight={50} right={0} size={350} />
         <div ref={optionsRef} className={classes.options}>
           <div key={activeCategory} className={classes.optionsContent}>
             {categories[activeCategory].content}
