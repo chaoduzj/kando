@@ -28,19 +28,50 @@ import {
   Blossom,
 } from '../common';
 import classNames from 'classnames/bind';
-import { useAutoAnimate } from '@formkit/auto-animate/react';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import * as classes from './GeneralSettingsDialog.module.scss';
 const cx = classNames.bind(classes);
 
 /** This dialog allows the user to configure some general settings of Kando. */
 export default function GeneralSettingsDialog() {
+  type TransitionDirection = 'down' | 'up';
+
   const settingsDialogVisible = useAppState((state) => state.settingsDialogVisible);
   const setSettingsDialogVisible = useAppState((state) => state.setSettingsDialogVisible);
   const soundThemes = useAppState((state) => state.soundThemes);
   const [keepInputFocus] = useGeneralSetting('keepInputFocus');
   const backend = useAppState((state) => state.backendInfo);
   const [activeCategory, setActiveCategory] = React.useState(0);
-  const [optionsRef] = useAutoAnimate({ duration: 350 });
+  const [transitionDirection, setTransitionDirection] =
+    React.useState<TransitionDirection>('down');
+  const categoryTransitionDuration = 320; // 280ms animation + 40ms enter delay
+  const activeOptionsPageRef = React.createRef<HTMLDivElement>();
+
+  const handleCategorySelect = (categoryIndex: number) => {
+    if (categoryIndex === activeCategory) {
+      return;
+    }
+
+    setTransitionDirection(categoryIndex > activeCategory ? 'down' : 'up');
+    setActiveCategory(categoryIndex);
+  };
+
+  const pageTransitionClasses =
+    transitionDirection === 'down'
+      ? {
+          enter: classes.optionsPageEnterFromBottom,
+          enterActive: classes.optionsPageEnterActive,
+          enterDone: classes.optionsPageEnterDone,
+          exit: classes.optionsPageExit,
+          exitActive: classes.optionsPageExitToBottom,
+        }
+      : {
+          enter: classes.optionsPageEnterFromTop,
+          enterActive: classes.optionsPageEnterActive,
+          enterDone: classes.optionsPageEnterDone,
+          exit: classes.optionsPageExit,
+          exitActive: classes.optionsPageExitToTop,
+        };
 
   // Widget width
   const spinbuttonWidth = 60;
@@ -93,6 +124,11 @@ export default function GeneralSettingsDialog() {
             )}
             label={i18next.t('settings.general-settings-dialog.hardware-acceleration')}
             settingsKey="hardwareAcceleration"
+          />
+          <SettingsCheckbox
+            info={i18next.t('settings.general-settings-dialog.lazy-initialization-info')}
+            label={i18next.t('settings.general-settings-dialog.lazy-initialization')}
+            settingsKey="lazyInitialization"
           />
           <h1>Settings Dialog & Tray Icon</h1>
           <SettingsDropdown
@@ -235,7 +271,6 @@ export default function GeneralSettingsDialog() {
             )}
             settingsKey="enableAchievementNotifications"
           />
-          <Swirl marginBottom={20} marginTop={40} variant="2" width={350} />
         </>
       ),
     },
@@ -243,26 +278,6 @@ export default function GeneralSettingsDialog() {
       label: i18next.t('settings.general-settings-dialog.menu-behavior'),
       content: (
         <>
-          {backend.name === 'Windows' && (
-            <SettingsCheckbox
-              info={i18next.t(
-                'settings.general-settings-dialog.windows-ink-workaround-info'
-              )}
-              label={i18next.t('settings.general-settings-dialog.windows-ink-workaround')}
-              settingsKey="windowsInkWorkaround"
-            />
-          )}
-          <SettingsCheckbox
-            info={i18next.t('settings.general-settings-dialog.enable-marking-mode-info')}
-            label={i18next.t('settings.general-settings-dialog.enable-marking-mode')}
-            settingsKey="enableMarkingMode"
-          />
-          <SettingsCheckbox
-            info={i18next.t('settings.general-settings-dialog.enable-turbo-mode-info')}
-            isDisabled={keepInputFocus}
-            label={i18next.t('settings.general-settings-dialog.enable-turbo-mode')}
-            settingsKey="enableTurboMode"
-          />
           <SettingsCheckbox
             info={i18next.t(
               'settings.general-settings-dialog.move-pointer-to-menu-center-info'
@@ -274,38 +289,12 @@ export default function GeneralSettingsDialog() {
           />
           <SettingsCheckbox
             info={i18next.t(
-              'settings.general-settings-dialog.require-click-for-hover-mode-info'
-            )}
-            label={i18next.t(
-              'settings.general-settings-dialog.require-click-for-hover-mode'
-            )}
-            settingsKey="hoverModeNeedsConfirmation"
-          />
-          <SettingsCheckbox
-            info={i18next.t(
               'settings.general-settings-dialog.right-mouse-button-selects-parent-info'
             )}
             label={i18next.t(
               'settings.general-settings-dialog.right-mouse-button-selects-parent'
             )}
             settingsKey="rmbSelectsParent"
-          />
-          <SettingsCheckbox
-            info={i18next.t(
-              'settings.general-settings-dialog.enable-gamepad-support-info'
-            )}
-            label={i18next.t('settings.general-settings-dialog.enable-gamepad-support')}
-            settingsKey="enableGamepad"
-          />
-          <SettingsCheckbox
-            info={i18next.t('settings.general-settings-dialog.keep-input-focus-info')}
-            label={i18next.t('settings.general-settings-dialog.keep-input-focus')}
-            settingsKey="keepInputFocus"
-          />
-          <SettingsCheckbox
-            info={i18next.t('settings.general-settings-dialog.lazy-initialization-info')}
-            label={i18next.t('settings.general-settings-dialog.lazy-initialization')}
-            settingsKey="lazyInitialization"
           />
           <SettingsDropdown
             info={i18next.t('settings.general-settings-dialog.press-again-behavior-info')}
@@ -331,7 +320,55 @@ export default function GeneralSettingsDialog() {
             ]}
             settingsKey="sameShortcutBehavior"
           />
+          <h1>{i18next.t('settings.general-settings-dialog.interaction-modes')}</h1>
+          <SettingsCheckbox
+            info={i18next.t('settings.general-settings-dialog.enable-marking-mode-info')}
+            label={i18next.t('settings.general-settings-dialog.enable-marking-mode')}
+            settingsKey="enableMarkingMode"
+          />
+          <SettingsCheckbox
+            info={i18next.t('settings.general-settings-dialog.enable-turbo-mode-info')}
+            isDisabled={keepInputFocus}
+            label={i18next.t('settings.general-settings-dialog.enable-turbo-mode')}
+            settingsKey="enableTurboMode"
+          />
+          <SettingsCheckbox
+            info={i18next.t(
+              'settings.general-settings-dialog.require-click-for-hover-mode-info'
+            )}
+            label={i18next.t(
+              'settings.general-settings-dialog.require-click-for-hover-mode'
+            )}
+            settingsKey="hoverModeNeedsConfirmation"
+          />
+          <h1>{i18next.t('settings.general-settings-dialog.input-options')}</h1>
+          <SettingsCheckbox
+            info={i18next.t('settings.general-settings-dialog.keep-input-focus-info')}
+            label={i18next.t('settings.general-settings-dialog.keep-input-focus')}
+            settingsKey="keepInputFocus"
+          />
+          <SettingsCheckbox
+            info={i18next.t(
+              'settings.general-settings-dialog.enable-gamepad-support-info'
+            )}
+            label={i18next.t('settings.general-settings-dialog.enable-gamepad-support')}
+            settingsKey="enableGamepad"
+          />
+          {backend.name === 'Windows' && (
+            <SettingsCheckbox
+              info={i18next.t(
+                'settings.general-settings-dialog.windows-ink-workaround-info'
+              )}
+              label={i18next.t('settings.general-settings-dialog.windows-ink-workaround')}
+              settingsKey="windowsInkWorkaround"
+            />
+          )}
           <Swirl marginBottom={20} marginTop={40} variant="2" width={350} />
+          <Note isCentered useMarkdown>
+            {i18next.t('settings.general-settings-dialog.learn-interaction-mode', {
+              link: 'https://kando.menu/usage/',
+            })}
+          </Note>
         </>
       ),
     },
@@ -669,16 +706,24 @@ export default function GeneralSettingsDialog() {
             <div
               key={cat.label}
               className={cx('category', { active: idx === activeCategory })}
-              onClick={() => setActiveCategory(idx)}>
+              onClick={() => handleCategorySelect(idx)}>
               {cat.label}
             </div>
           ))}
         </div>
         <Blossom bottom={0} cropBottom={50} cropRight={50} right={0} size={350} />
-        <div ref={optionsRef} className={classes.options}>
-          <div key={activeCategory} className={classes.optionsContent}>
-            {categories[activeCategory].content}
-          </div>
+        <div className={classes.options}>
+          <TransitionGroup component={null}>
+            <CSSTransition
+              key={activeCategory}
+              classNames={pageTransitionClasses}
+              nodeRef={activeOptionsPageRef}
+              timeout={categoryTransitionDuration}>
+              <div ref={activeOptionsPageRef} className={classes.optionsPage}>
+                {categories[activeCategory].content}
+              </div>
+            </CSSTransition>
+          </TransitionGroup>
         </div>
       </div>
     </Modal>

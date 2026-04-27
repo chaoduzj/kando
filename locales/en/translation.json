@@ -200,7 +200,10 @@
       "dev-tools-note": "Kando uses two windows: One for the menu and one for the settings. You can open the development tools to inspect both windows separately.",
       "menu-window-dev-tools": "Inspect menu",
       "settings-window-dev-tools": "Inspect settings",
-      "app-settings": "Application Settings"
+      "app-settings": "Application Settings",
+      "interaction-modes": "Interaction Modes",
+      "input-options": "Input Options",
+      "learn-interaction-mode": "Learn more about Kando's interaction modes [here]({{link}})!"
     },
     "introduction-dialog": {
       "slide1-title": "Kando offers a unique and efficient way for interacting with your computer.",
