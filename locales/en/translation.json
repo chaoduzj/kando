@@ -203,7 +203,9 @@
       "app-settings": "Application Settings",
       "interaction-modes": "Interaction Modes",
       "input-options": "Input Options",
-      "learn-interaction-mode": "Learn more about Kando's interaction modes [here]({{link}})!"
+      "learn-interaction-mode": "Learn more about Kando's interaction modes [here]({{link}})!",
+      "backup-menus-note": "This will backup or restore all your menus at once. This includes all your configured shortcuts, menu layouts, and your menu collections.",
+      "backup-settings-note": "This will backup or restore Kando's settings, which include all your general settings and your menu-theme configuration."
     },
     "introduction-dialog": {
       "slide1-title": "Kando offers a unique and efficient way for interacting with your computer.",

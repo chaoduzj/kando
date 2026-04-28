@@ -625,8 +625,7 @@ export default function GeneralSettingsDialog() {
             />
           </div>
           <Note isCentered marginBottom={32} marginTop={8}>
-            This will backup or restore all your menus at once. This includes all your
-            configured shortcuts, menu layouts, and your menu collections.
+            {i18next.t('settings.general-settings-dialog.backup-menus-note')}
           </Note>
 
           <div style={{ display: 'flex', gap: 2 }}>
@@ -652,8 +651,7 @@ export default function GeneralSettingsDialog() {
             />
           </div>
           <Note isCentered marginTop={8}>
-            This will backup or restore Kando's settings, which include all your general
-            settings and your menu-theme configuration.
+            {i18next.t('settings.general-settings-dialog.backup-settings-note')}
           </Note>
           <Swirl marginTop={20} variant="3" width={300} />
         </>
