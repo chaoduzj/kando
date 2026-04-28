@@ -8,21 +8,28 @@
 // SPDX-FileCopyrightText: Simon Schneegans <code@simonschneegans.de>
 // SPDX-License-Identifier: MIT
 
-@use 'sass:color';
+// Blossom filter opacity for different color schemes
 
-@use '../../mixins.scss' as *;
+:global(body.systemColors) {
+  .blossom {
+    filter: grayscale(80%) opacity(0.2) blur(2px);
+  }
 
-.filePicker {
-  display: flex;
-  align-items: stretch;
+  @media (prefers-color-scheme: dark) {
+    .blossom {
+      filter: grayscale(80%) opacity(0.03) blur(2px);
+    }
+  }
+}
 
-  input {
-    @include text-input;
+:global(body.lightColors) {
+  .blossom {
+    filter: grayscale(80%) opacity(0.2) blur(2px);
+  }
+}
 
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-
-    flex-grow: 1;
-    min-width: 0;
+:global(body.darkColors) {
+  .blossom {
+    filter: grayscale(80%) opacity(0.03) blur(2px);
   }
 }

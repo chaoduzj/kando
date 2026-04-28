@@ -9,14 +9,14 @@
 // SPDX-License-Identifier: MIT
 
 @use '../../variables.scss' as *;
+@use '../../mixins.scss' as *;
 
 .button {
+  @include normal-button;
+
   display: inline-flex;
   align-items: center;
 
-  color: $text-normal;
-  border: none;
-  border-radius: 5px;
   font-size: inherit;
   white-space: nowrap;
   line-height: 1.3rem;
@@ -73,59 +73,20 @@
   justify-content: center;
 }
 
-.secondary {
-  background-color: $widget-normal;
-
-  &:hover {
-    background-color: $widget-normal-hover;
-  }
-
-  &.pressed {
-    background-color: $widget-normal-active;
-  }
-}
-
-.flat {
-  background-color: transparent;
-
-  &:hover {
-    background-color: $widget-light;
-  }
+.invisible {
+  @include invisible-button;
 }
 
 .tool {
-  background-color: transparent;
-  opacity: 0.8;
-
-  &:hover {
-    opacity: 1;
-  }
+  @include tool-button;
 }
 
 .primary {
-  background-color: $widget-primary;
-
-  &:hover {
-    background-color: $widget-primary-hover;
-  }
-
-  &.pressed {
-    background-color: $widget-primary-active;
-  }
+  @include primary-button;
 }
 
 .floating {
-  background-color: $widget-normal;
   border-radius: 50px;
-
-  &:hover {
-    color: $text-link-hover;
-    background-color: $widget-normal-hover;
-  }
-
-  &.pressed {
-    background-color: $widget-normal-active;
-  }
 }
 
 .small {

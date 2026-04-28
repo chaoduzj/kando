@@ -12,7 +12,7 @@
 
 .sidebar {
   min-height: 0px; // This is important to make the scrollboxes work.
-  background-color: $toolbar-background;
+  background-color: light-dark(rgba($base-light, 0.9), rgba($base-dark, 0.9));
   width: 350px;
   min-width: 250px;
   display: flex;

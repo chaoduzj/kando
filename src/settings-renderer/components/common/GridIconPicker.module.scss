@@ -25,11 +25,11 @@
   }
 
   &:hover {
-    background-color: $widget-light;
+    background-color: $widget-normal;
   }
 
   &.selected {
-    background-color: $widget-selected;
+    background-color: $widget-normal;
     outline: $border-selected;
     outline-offset: -2px;
   }

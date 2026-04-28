@@ -9,6 +9,7 @@
 // SPDX-License-Identifier: MIT
 
 @use '../../variables.scss' as *;
+@use '../../mixins.scss' as *;
 
 .collectionsList {
   -webkit-app-region: drag;
@@ -21,11 +22,9 @@
 
 .collection,
 .deleteButton {
+  @include invisible-button;
+
   display: block;
-  border: none;
-  background-color: $widget-dark;
-  color: $text-normal;
-  border: 1px solid transparent;
   padding: 3px;
 
   border-radius: 50%;
@@ -35,22 +34,16 @@
     background-color: transparent;
 
     &:hover {
-      background-color: $widget-dark;
+      background-color: $widget-normal;
     }
   }
 
   &.selected {
-    background-color: $widget-selected;
     border: $border-selected;
-    color: $text-normal;
 
     &:hover:not(:has(:hover)) {
-      background-color: $widget-selected-hover;
+      background-color: $widget-normal;
     }
-  }
-
-  &:hover:not(:has(:hover)) {
-    background-color: $widget-dark-hover;
   }
 
   &:active:not(:has(:active)) {
@@ -86,7 +79,8 @@
 
 .deleteButton {
   opacity: 0;
-  background-color: $widget-selected;
+  background-color: $window-background;
+  border: $border-selected;
   padding: 0;
   pointer-events: none;
   position: absolute;
@@ -100,7 +94,7 @@
   transition: opacity 0.2s;
 
   &:hover {
-    background-color: $widget-selected-hover;
+    background-color: $widget-normal-hover;
   }
 }
 

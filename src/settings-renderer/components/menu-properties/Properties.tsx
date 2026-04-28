@@ -118,7 +118,7 @@ export default function Properties() {
             icon={selectedItem.icon}
             iconSize="4em"
             theme={selectedItem.iconTheme}
-            variant="flat"
+            variant="invisible"
             onChange={(icon, theme) => {
               editMenuItem(selectedMenu, selectedChildPath, (item) => {
                 item.icon = icon;
@@ -131,7 +131,7 @@ export default function Properties() {
         <div className={classes.name}>
           <TextInput
             initialValue={selectedItem.name}
-            variant="flat"
+            variant="invisible"
             onChange={(name) => {
               editMenuItem(selectedMenu, selectedChildPath, (item) => {
                 item.name = name;

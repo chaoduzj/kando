@@ -10,13 +10,12 @@
 
 @use 'sass:color';
 
-$base-dark: #24272f;
-$base-light: #fff;
+$base-dark: #222226;
+$base-light: #fafafb;
 $key-dark: #9f3b67;
 $key-light: #f0cece;
 
 $text-normal: light-dark(#333, #eee);
-$text-inverted: light-dark(#eee, #333);
 $text-always-light: light-dark(#eee, #fff);
 $text-muted: light-dark(#777, #aaa);
 $text-link: light-dark($key-dark, $key-light);
@@ -25,74 +24,31 @@ $text-link-hover: light-dark(
   color.adjust($key-light, $lightness: 10%)
 );
 
-$toolbar-background: light-dark(
-  rgba(color.adjust($base-light, $lightness: -10%), 0.9),
-  rgba(color.adjust($base-dark, $lightness: -5%), 0.9)
-);
 $window-background: light-dark($base-light, $base-dark);
-$modal-background: light-dark(rgba(#747474, 0.5), rgba(156, 169, 205, 0.2));
-$popover-background: light-dark($base-light, color.adjust($base-dark, $lightness: -5%));
-
-$widget-primary: light-dark($key-light, $key-dark);
-$widget-primary-hover: light-dark(
-  color.adjust($key-light, $lightness: -10%),
-  color.adjust($key-dark, $lightness: 10%)
-);
-$widget-primary-active: light-dark(
-  color.adjust($key-light, $lightness: -20%),
-  color.adjust($key-dark, $lightness: 20%)
-);
-
-$widget-dark: light-dark(
-  rgba(color.adjust($base-light, $lightness: -30%), 0.5),
-  rgba(color.adjust($base-dark, $lightness: 30%), 0.5)
-);
-$widget-dark-hover: light-dark(
-  rgba(color.adjust($base-light, $lightness: -40%), 0.5),
-  rgba(color.adjust($base-dark, $lightness: 40%), 0.5)
-);
 
 $widget-normal: light-dark(
-  rgba(color.adjust($base-light, $lightness: -20%), 0.5),
-  rgba(color.adjust($base-dark, $lightness: 20%), 0.5)
+  rgba(color.adjust($base-light, $lightness: -10%), $alpha: 0.8),
+  rgba(color.adjust($base-dark, $lightness: 20%), $alpha: 0.8)
 );
 $widget-normal-hover: light-dark(
-  rgba(color.adjust($base-light, $lightness: -30%), 0.5),
-  rgba(color.adjust($base-dark, $lightness: 30%), 0.5)
+  rgba(color.adjust($base-light, $lightness: -15%), $alpha: 0.8),
+  rgba(color.adjust($base-dark, $lightness: 25%), $alpha: 0.8)
 );
 $widget-normal-active: light-dark(
-  rgba(color.adjust($base-light, $lightness: -40%), 0.5),
-  rgba(color.adjust($base-dark, $lightness: 40%), 0.5)
-);
-
-$widget-light: light-dark(
-  rgba(color.adjust($base-light, $lightness: -10%), 0.5),
-  rgba(color.adjust($base-dark, $lightness: 10%), 0.5)
-);
-$widget-light-hover: light-dark(
-  rgba(color.adjust($base-light, $lightness: -20%), 0.5),
-  rgba(color.adjust($base-dark, $lightness: 20%), 0.5)
+  rgba(color.adjust($base-light, $lightness: -20%), $alpha: 0.8),
+  rgba(color.adjust($base-dark, $lightness: 30%), $alpha: 0.8)
 );
 
 $widget-inverted: light-dark(
-  rgba(color.adjust($base-light, $lightness: -70%), 0.7),
-  rgba(color.adjust($base-dark, $lightness: 50%), 0.7)
+  color.adjust($base-light, $lightness: -50%),
+  color.adjust($base-dark, $lightness: 40%)
 );
 $widget-inverted-hover: light-dark(
-  rgba(color.adjust($base-light, $lightness: -80%), 0.7),
-  rgba(color.adjust($base-dark, $lightness: 40%), 0.7)
+  color.adjust($base-light, $lightness: -60%),
+  color.adjust($base-dark, $lightness: 50%)
 );
 
-$widget-selected: light-dark(
-  rgba(color.mix($key-dark, color.adjust($base-light, $lightness: -10%), 20%), 0.5),
-  rgba(color.mix($key-light, color.adjust($base-dark, $lightness: 10%), 30%), 0.5)
-);
-
-$widget-selected-hover: light-dark(
-  rgba(color.mix($key-dark, color.adjust($base-light, $lightness: -10%), 30%), 0.5),
-  rgba(color.mix($key-light, color.adjust($base-dark, $lightness: 10%), 40%), 0.5)
-);
-
+$area-border: 1px solid light-dark(rgba(#333, 0.15), rgba(#eee, 0.15));
 $drop-highlight: 0 0 10px light-dark($key-dark, $key-light);
 $border-selected: 1.5px solid light-dark($key-dark, $key-light);
 $border-focused: 1.5px solid
@@ -100,5 +56,3 @@ $border-focused: 1.5px solid
     color.mix($key-dark, color.adjust($base-light, $lightness: -10%), 50%),
     color.mix($key-light, color.adjust($base-dark, $lightness: 10%), 50%)
   );
-
-$area-border: 1px solid light-dark(rgba(#333, 0.15), rgba(#eee, 0.15));

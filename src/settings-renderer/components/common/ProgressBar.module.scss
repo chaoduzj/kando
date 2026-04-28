@@ -8,6 +8,8 @@
 // SPDX-FileCopyrightText: Simon Schneegans <code@simonschneegans.de>
 // SPDX-License-Identifier: MIT
 
+@use 'sass:color';
+
 @use '../../variables.scss' as *;
 
 .progressBar {
@@ -28,7 +30,10 @@
   .bar {
     width: 100%;
     height: 100%;
-    background-color: $toolbar-background;
+    background-color: light-dark(
+      color.adjust($base-light, $lightness: -5%),
+      color.adjust($base-dark, $lightness: -5%)
+    );
   }
 
   .progress {

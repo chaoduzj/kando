@@ -88,7 +88,7 @@ export default function AppPicker(props: Props) {
                 align="left"
                 icon={<ThemedIcon name={app.icon} size={24} theme={app.iconTheme} />}
                 label={app.name}
-                variant={app.id === value?.id ? 'secondary' : 'flat'}
+                variant={app.id === value?.id ? 'secondary' : 'invisible'}
                 onClick={() => {
                   setValue(app);
                 }}

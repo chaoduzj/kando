@@ -12,7 +12,7 @@ import React from 'react';
 import i18next from 'i18next';
 import {
   TbSettingsFilled,
-  TbHeartFilled,
+  TbInfoSquareRoundedFilled,
   TbPaletteFilled,
   TbTrophyFilled,
 } from 'react-icons/tb';
@@ -82,7 +82,7 @@ export default function PreviewHeader() {
             />
             <Button
               isGrouped
-              icon={<TbHeartFilled />}
+              icon={<TbInfoSquareRoundedFilled />}
               tooltip={i18next.t('settings.about-dialog.title')}
               variant="tool"
               onClick={() => setAboutDialogVisible(true)}

@@ -9,15 +9,12 @@
 // SPDX-License-Identifier: MIT
 
 @use '../../variables.scss' as *;
+@use '../../mixins.scss' as *;
 
 textarea.picker {
-  background-color: $widget-normal;
+  @include text-input;
 
-  color: $text-normal;
-  border: none;
-  border-radius: 5px;
-  font-size: inherit;
-  padding: 5px;
+  padding: 10px;
   margin-top: 8px;
 
   transition: box-shadow 150ms ease;
@@ -25,10 +22,6 @@ textarea.picker {
   flex-grow: 1;
 
   overflow-x: hidden;
-
-  &:hover {
-    background-color: $widget-normal-hover;
-  }
 
   &.invalid {
     box-shadow: 0 0 15px rgba(255, 64, 64, 1) inset;

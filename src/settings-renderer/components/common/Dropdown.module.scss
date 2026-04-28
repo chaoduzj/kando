@@ -9,19 +9,12 @@
 // SPDX-License-Identifier: MIT
 
 @use '../../variables.scss' as *;
+@use '../../mixins.scss' as *;
 
 .select {
-  background-color: $widget-normal;
+  @include text-input;
+
+  cursor: default;
+
   width: 100%;
-
-  color: $text-normal;
-  border: none;
-  border-radius: 5px;
-  font-size: inherit;
-
-  padding: 3px;
-
-  &:hover {
-    background-color: $widget-normal-hover;
-  }
 }

@@ -13,7 +13,7 @@ declare const window: WindowWithAPIs;
 
 import React from 'react';
 import i18next from 'i18next';
-import { TbExternalLink, TbHeartFilled } from 'react-icons/tb';
+import { TbExternalLink, TbInfoSquareRoundedFilled } from 'react-icons/tb';
 
 import { useAppState } from '../../state';
 import { Swirl, Modal, Button, Note } from '../common';
@@ -35,7 +35,7 @@ export default function AboutDialog() {
 
   return (
     <Modal
-      icon={<TbHeartFilled />}
+      icon={<TbInfoSquareRoundedFilled />}
       isVisible={aboutDialogVisible}
       maxWidth={650}
       title={i18next.t('settings.about-dialog.title')}
