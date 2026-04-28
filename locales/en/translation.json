@@ -187,7 +187,7 @@
       "wlroots-pointer-get-timeout-default-behavior": "Pointer fallback position",
       "center": "Center",
       "previously-reported": "Previously reported",
-      "backup-and-restore": "Backup and Restore",
+      "backup-and-restore": "Backup & Restore",
       "message": "All your menus and Kando's settings are stored in two JSON files which you can also edit, share, or backup. Click [here]({{link}}) to open the directory where the files are stored.",
       "backup-menus": "Backup menus.json…",
       "backup-settings": "Backup config.json…",

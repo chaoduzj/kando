@@ -14,7 +14,13 @@ declare const window: WindowWithAPIs;
 import React from 'react';
 import i18next from 'i18next';
 
-import { TbSettingsFilled, TbReload, TbPointer, TbPointerCog } from 'react-icons/tb';
+import {
+  TbSettingsFilled,
+  TbReload,
+  TbPointer,
+  TbPointerCog,
+  TbRestore,
+} from 'react-icons/tb';
 import { FaDownload } from 'react-icons/fa';
 import { useAppState, useGeneralSetting } from '../../state';
 import {
@@ -585,48 +591,10 @@ export default function GeneralSettingsDialog() {
       label: i18next.t('settings.general-settings-dialog.backup-and-restore'),
       content: (
         <>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Button
-              isBlock
-              icon={<FaDownload />}
-              label={i18next.t('settings.general-settings-dialog.backup-menus')}
-              paddingBottom={16}
-              paddingTop={16}
-              onClick={() => {
-                window.settingsAPI.backupMenuSettings();
-              }}
-            />
-            <Button
-              isBlock
-              icon={<FaDownload />}
-              label={i18next.t('settings.general-settings-dialog.backup-settings')}
-              paddingBottom={16}
-              paddingTop={16}
-              onClick={() => {
-                window.settingsAPI.backupGeneralSettings();
-              }}
-            />
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Button
-              isBlock
-              label={i18next.t('settings.general-settings-dialog.restore-menus')}
-              onClick={() => {
-                window.settingsAPI.restoreMenuSettings();
-              }}
-            />
-            <Button
-              isBlock
-              label={i18next.t('settings.general-settings-dialog.restore-settings')}
-              onClick={() => {
-                window.settingsAPI.restoreGeneralSettings();
-              }}
-            />
-          </div>
-          <Swirl marginBottom={20} marginTop={40} variant="2" width={350} />
           <Note
             isCentered
             useMarkdown
+            marginBottom={20}
             onLinkClick={() => {
               window.settingsAPI.getConfigDirectory().then((dir) => {
                 window.open('file://' + dir, '_blank');
@@ -634,6 +602,60 @@ export default function GeneralSettingsDialog() {
             }}>
             {i18next.t('settings.general-settings-dialog.message', { link: '' })}
           </Note>
+          <div style={{ display: 'flex', gap: 2 }}>
+            <Button
+              isBlock
+              isGrouped
+              icon={<FaDownload />}
+              label={i18next.t('settings.general-settings-dialog.backup-menus')}
+              variant="floating"
+              onClick={() => {
+                window.settingsAPI.backupMenuSettings();
+              }}
+            />
+            <Button
+              isBlock
+              isGrouped
+              icon={<TbRestore />}
+              label={i18next.t('settings.general-settings-dialog.restore-menus')}
+              variant="floating"
+              onClick={() => {
+                window.settingsAPI.restoreMenuSettings();
+              }}
+            />
+          </div>
+          <Note isCentered marginBottom={32} marginTop={8}>
+            This will backup or restore all your menus at once. This includes all your
+            configured shortcuts, menu layouts, and your menu collections.
+          </Note>
+
+          <div style={{ display: 'flex', gap: 2 }}>
+            <Button
+              isBlock
+              isGrouped
+              icon={<FaDownload />}
+              label={i18next.t('settings.general-settings-dialog.backup-settings')}
+              variant="floating"
+              onClick={() => {
+                window.settingsAPI.backupGeneralSettings();
+              }}
+            />
+            <Button
+              isBlock
+              isGrouped
+              icon={<TbRestore />}
+              label={i18next.t('settings.general-settings-dialog.restore-settings')}
+              variant="floating"
+              onClick={() => {
+                window.settingsAPI.restoreGeneralSettings();
+              }}
+            />
+          </div>
+          <Note isCentered marginTop={8}>
+            This will backup or restore Kando's settings, which include all your general
+            settings and your menu-theme configuration.
+          </Note>
+          <Swirl marginTop={20} variant="3" width={300} />
         </>
       ),
     },
@@ -642,19 +664,23 @@ export default function GeneralSettingsDialog() {
       content: (
         <>
           <Note>{i18next.t('settings.general-settings-dialog.reload-note')}</Note>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 2 }}>
             <Button
               isBlock
+              isGrouped
               icon={<TbReload />}
               label={i18next.t('settings.general-settings-dialog.reload-menu-theme')}
+              variant="floating"
               onClick={() => {
                 window.settingsAPI.reloadMenuTheme();
               }}
             />
             <Button
               isBlock
+              isGrouped
               icon={<TbReload />}
               label={i18next.t('settings.general-settings-dialog.reload-sound-theme')}
+              variant="floating"
               onClick={() => {
                 window.settingsAPI.reloadSoundTheme();
               }}
@@ -663,27 +689,31 @@ export default function GeneralSettingsDialog() {
           <Note marginTop={8}>
             {i18next.t('settings.general-settings-dialog.dev-tools-note')}
           </Note>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 2 }}>
             <Button
               isBlock
+              isGrouped
               icon={<TbPointer />}
               label={i18next.t('settings.general-settings-dialog.menu-window-dev-tools')}
+              variant="floating"
               onClick={() => {
                 window.settingsAPI.showDevTools('menu-window');
               }}
             />
             <Button
               isBlock
+              isGrouped
               icon={<TbPointerCog />}
               label={i18next.t(
                 'settings.general-settings-dialog.settings-window-dev-tools'
               )}
+              variant="floating"
               onClick={() => {
                 window.settingsAPI.showDevTools('settings-window');
               }}
             />
           </div>
-          <Swirl marginBottom={20} marginTop={40} variant="2" width={350} />
+          <Swirl marginBottom={20} marginTop={40} variant="3" width={300} />
         </>
       ),
     },
