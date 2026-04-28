@@ -21,8 +21,13 @@ This changelog follows the rules of [Keep a Changelog](http://keepachangelog.com
 
 **Release Date:** TBD
 
+### :tada: Added
+
+- A redesigned General-Settings dialog with a completely new layout. All the options are still there, but they are now organized in categories which should make it easier to navigate through the settings.
+
 ### :wrench: Changed
 
+- The styling of the settings dialog has been updated in various places to make it look more modern.
 - Updated many dependencies to their latest versions. Feel free to report any issues you encounter!
 
 ## [Kando 2.3.0](https://github.com/kando-menu/kando/releases/tag/v2.3.0)
