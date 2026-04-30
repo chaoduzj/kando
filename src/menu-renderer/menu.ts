@@ -216,7 +216,10 @@ export class Menu extends EventEmitter {
       // To ensure that all DOM changes are applied, flush the browser's rendering
       // pipeline first.
       this.container.getBoundingClientRect();
-      this.container.classList.remove('no-transitions');
+
+      if (this.settings.enableMenuAnimations) {
+        this.container.classList.remove('no-transitions');
+      }
 
       // If required, move the pointer to the center of the menu.
       if (this.settings.warpMouse && this.showMenuOptions.centeredMode) {
@@ -307,7 +310,6 @@ export class Menu extends EventEmitter {
       '--fade-out-duration',
       `${this.settings.fadeOutDuration}ms`
     );
-
     this.pointerInput.enableMarkingMode = this.settings.enableMarkingMode;
     this.pointerInput.enableTurboMode = this.settings.enableTurboMode;
     this.pointerInput.dragThreshold = this.settings.dragThreshold;
@@ -1062,7 +1064,12 @@ export class Menu extends EventEmitter {
           } else {
             // Set the custom CSS properties of the item, like the angular difference between
             // the item and the mouse pointer direction.
-            this.theme.setChildProperties(child, this.latestInput.angle);
+            this.theme.setChildProperties(
+              child,
+              this.settings.enablePointerReactiveEffects
+                ? this.latestInput.angle
+                : (child.angle + 180) % 360
+            );
             child.nodeDiv.style.transform = '';
             delete child.relativePosition;
           }
