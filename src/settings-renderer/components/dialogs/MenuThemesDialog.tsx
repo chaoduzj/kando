@@ -344,6 +344,15 @@ export default function MenuThemesDialog() {
       <div className={classes.container}>
         <div className={classes.sidebar}>
           <SettingsSpinbutton
+            info={i18next.t('settings.menu-themes-dialog.menu-scale-info')}
+            label={i18next.t('settings.menu-themes-dialog.menu-scale')}
+            max={5}
+            min={0.5}
+            settingsKey="zoomFactor"
+            step={0.1}
+            width={spinbuttonWidth}
+          />
+          <SettingsSpinbutton
             info={i18next.t('settings.menu-themes-dialog.fade-in-time-info')}
             label={i18next.t('settings.menu-themes-dialog.fade-in-time')}
             max={500}
@@ -361,27 +370,33 @@ export default function MenuThemesDialog() {
             step={10}
             width={spinbuttonWidth}
           />
-          <SettingsSpinbutton
-            info={i18next.t('settings.menu-themes-dialog.menu-scale-info')}
-            label={i18next.t('settings.menu-themes-dialog.menu-scale')}
-            max={5}
-            min={0.5}
-            settingsKey="zoomFactor"
-            step={0.1}
-            width={spinbuttonWidth}
+          <SettingsCheckbox
+            info={i18next.t('settings.menu-themes-dialog.light-dark-mode-info')}
+            label={i18next.t('settings.menu-themes-dialog.light-dark-mode')}
+            settingsKey="enableDarkModeForMenuThemes"
+          />
+          <SettingsCheckbox
+            info={i18next.t('settings.menu-themes-dialog.enable-menu-animations-info')}
+            label={i18next.t('settings.menu-themes-dialog.enable-menu-animations')}
+            settingsKey="enableMenuAnimations"
+          />
+          <SettingsCheckbox
+            info={i18next.t(
+              'settings.menu-themes-dialog.enable-pointer-reactive-effects-info'
+            )}
+            label={i18next.t(
+              'settings.menu-themes-dialog.enable-pointer-reactive-effects'
+            )}
+            settingsKey="enablePointerReactiveEffects"
           />
           <SettingsCheckbox
             info={i18next.t('settings.menu-themes-dialog.selection-wedges-info')}
             label={i18next.t('settings.menu-themes-dialog.selection-wedges')}
             settingsKey="enableSelectionWedges"
           />
-          <SettingsCheckbox
-            info={i18next.t('settings.menu-themes-dialog.light-dark-mode-info')}
-            label={i18next.t('settings.menu-themes-dialog.light-dark-mode')}
-            settingsKey="enableDarkModeForMenuThemes"
-          />
 
           {accentColorsNode}
+
           <div style={{ flexGrow: 1 }} />
 
           <Swirl marginBottom={20} marginTop={10} variant="1" width={250} />
@@ -410,7 +425,7 @@ export default function MenuThemesDialog() {
             onClick={openThemeDirectory}
           />
         </div>
-        <Scrollbox maxHeight="min(80vh, 600px)" width="100%">
+        <Scrollbox maxHeight="min(85vh, 700px)" width="100%">
           <div className={classes.themesGrid}>
             {themes.map((theme) => {
               let previewPath =

@@ -61,10 +61,9 @@ body {
     }
   }
 
-  &.no-transitions {
-    .menu-node {
-      transition: none !important;
-    }
+  &.no-transitions * {
+    transition: none !important;
+    animation: none !important;
   }
 
   // Up to Kando 1.8.0, bootstrap was included in the app. To not break existing themes,

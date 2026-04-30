@@ -58,6 +58,18 @@ export const GENERAL_SETTINGS_SCHEMA_V1 = z.object({
   /** If disabled, no selection wedges will be drawn. */
   enableSelectionWedges: z.boolean().default(false),
 
+  /** The time in milliseconds it takes to fade in the menu. */
+  fadeInDuration: z.number().min(0).default(150),
+
+  /** The time in milliseconds it takes to fade out the menu. */
+  fadeOutDuration: z.number().min(0).default(200),
+
+  /** If false, all CSS transitions and animations in the menu are disabled. */
+  enableMenuAnimations: z.boolean().default(true),
+
+  /** If false, effects based on the current pointer position are disabled. */
+  enablePointerReactiveEffects: z.boolean().default(true),
+
   /** The name of the current sound theme. */
   soundTheme: z.string().default('none'),
 
@@ -138,12 +150,6 @@ export const GENERAL_SETTINGS_SCHEMA_V1 = z.object({
    * released, an item is dragged.
    */
   dragThreshold: z.number().min(0).default(15),
-
-  /** The time in milliseconds it takes to fade in the menu. */
-  fadeInDuration: z.number().min(0).default(150),
-
-  /** The time in milliseconds it takes to fade out the menu. */
-  fadeOutDuration: z.number().min(0).default(200),
 
   /**
    * If enabled, the menu will not take the input focus when opened. This will disable
@@ -252,12 +258,6 @@ export const GENERAL_SETTINGS_SCHEMA_V1 = z.object({
 
   /** If enabled, notifications are shown when achievements are unlocked. */
   enableAchievementNotifications: z.boolean().default(true),
-
-  /** If true, all CSS transitions and animations in the menu are disabled. */
-  disableMenuAnimations: z.boolean().default(false),
-
-  /** If true, pointer-distance scaling of menu items is disabled. */
-  disablePointerScaling: z.boolean().default(false),
 });
 
 export type GeneralSettingsV1 = z.infer<typeof GENERAL_SETTINGS_SCHEMA_V1>;
