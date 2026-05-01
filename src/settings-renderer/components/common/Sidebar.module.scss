@@ -9,10 +9,14 @@
 // SPDX-License-Identifier: MIT
 
 @use '../../variables.scss' as *;
+@use 'sass:color';
 
 .sidebar {
   min-height: 0px; // This is important to make the scrollboxes work.
-  background-color: light-dark(rgba($base-light, 0.9), rgba($base-dark, 0.9));
+  background-color: light-dark(
+    rgba(color.adjust($base-light, $lightness: -2%), 0.9),
+    rgba(color.adjust($base-dark, $lightness: -5%), 0.9)
+  );
   width: 350px;
   min-width: 250px;
   display: flex;

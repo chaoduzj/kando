@@ -48,7 +48,7 @@ $widget-inverted-hover: light-dark(
   color.adjust($base-dark, $lightness: 50%)
 );
 
-$area-border: 1px solid light-dark(rgba(#333, 0.15), rgba(#eee, 0.15));
+$area-border: 1px solid light-dark(rgba(#333, 0.15), rgba(#9e9e9e, 0.15));
 $drop-highlight: 0 0 10px light-dark($key-dark, $key-light);
 $border-selected: 1.5px solid light-dark($key-dark, $key-light);
 $border-focused: 1.5px solid
